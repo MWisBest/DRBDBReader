@@ -68,8 +68,8 @@ namespace DRBDBReader.DB
 			// get converter info
 			byte[] convertfield = this.table.readFieldRaw( this, FIELD_CONVERSION );
 			
-			ushort cfid = (ushort)this.table.readInternal( convertfield, 2, 2 );
-			ushort dsid = (ushort)this.table.readInternal( convertfield, 4, 2 );
+			ushort dsid = (ushort)this.table.readInternal( convertfield, 2, 2 );
+			ushort cfid = (ushort)this.table.readInternal( convertfield, 4, 2 );
 
 			switch( convertfield[0] )
 			{
