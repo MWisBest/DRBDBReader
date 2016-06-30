@@ -23,26 +23,27 @@ namespace DRBDBReader.DB.Units
 	{
 		private const byte FIELD_SLOPE = 1;
 		private const byte FIELD_OFFSET = 2;
+		private const byte FIELD_NDS_UNIT = 6;
 
-		public float slope = 0.0F;
+		public float slope;
 
-		public float offset = 0.0F;
+		public float offset;
+
+		public ushort unitid;
+		public string unit;
 
 		public NumericConverter( Database db, byte[] record, ushort cfid, ushort dsid ) : base( db, record, cfid, dsid )
 		{
 			Table numConvTable = this.db.tables[Database.TABLE_CONVERTERS_NUMERIC];
 			Record numConvRecord = numConvTable.getRecord( this.cfid );
 
-			if( numConvRecord != null )
-			{
-				this.slope = BitConverter.ToSingle( BitConverter.GetBytes( (int)numConvTable.readField( numConvRecord, FIELD_SLOPE ) ), 0 );
+			this.slope = BitConverter.ToSingle( BitConverter.GetBytes( (int)numConvTable.readField( numConvRecord, FIELD_SLOPE ) ), 0 );
+			this.offset = BitConverter.ToSingle( BitConverter.GetBytes( (int)numConvTable.readField( numConvRecord, FIELD_OFFSET ) ), 0 );
 
-				this.offset = BitConverter.ToSingle( BitConverter.GetBytes( (int)numConvTable.readField( numConvRecord, FIELD_OFFSET ) ), 0 );
-			}
-			else
-			{
-				;
-			}
+			Table ndsTable = this.db.tables[Database.TABLE_NUMERIC_DATA_SPECIFIER];
+			Record ndsRecord = ndsTable.getRecord( this.dsid );
+			this.unitid = (ushort)ndsTable.readField( ndsRecord, FIELD_NDS_UNIT );
+			this.unit = ( this.unitid != 0 ? this.db.getStateString( this.unitid ) : "" );
 		}
 	}
 }
