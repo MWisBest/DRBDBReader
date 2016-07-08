@@ -147,7 +147,7 @@ namespace DRBDBReader
 
 						try
 						{
-							this.writeToConsole( this.db.getDetailedTxFromID( txid ) + Environment.NewLine );
+							this.writeToConsole( this.db.getDetailedTX( txid ) + Environment.NewLine );
 						}
 						catch
 						{
@@ -172,7 +172,7 @@ namespace DRBDBReader
 						{
 							try
 							{
-								string temp = this.db.getTxFromID( l );
+								string temp = this.db.getTX( l );
 								if( temp != null )
 								{
 									string templower = temp.ToLower();
@@ -225,7 +225,7 @@ namespace DRBDBReader
 							return;
 						}
 
-						string modresult = this.db.getModuleFromID( modid );
+						string modresult = this.db.getModule( modid );
 
 						if( modresult != null )
 						{
@@ -258,7 +258,7 @@ namespace DRBDBReader
 						{
 							try
 							{
-								string temp = this.db.getModuleFromID( l );
+								string temp = this.db.getModule( l );
 
 								if( temp != null )
 								{
@@ -327,7 +327,7 @@ namespace DRBDBReader
 
 							foreach( TXRecord txrec in modrec.dataelements )
 							{
-								string temp = this.db.getTxFromID( txrec.id );
+								string temp = this.db.getTX( txrec.id );
 								//if( temp.Contains( "J1850" ) )
 									this.writeBulkToConsole( temp + "; 0x" + txrec.id.ToString( "x" ) );
 							}

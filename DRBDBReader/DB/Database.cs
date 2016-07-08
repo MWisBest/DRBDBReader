@@ -242,7 +242,7 @@ namespace DRBDBReader.DB
 			return desrec.name;
 		}
 
-		public string getProtocolTextFromID( ushort id )
+		public string getProtocolText( ushort id )
 		{
 			switch( id )
 			{
@@ -255,7 +255,7 @@ namespace DRBDBReader.DB
 			}
 		}
 
-		public string getTxFromID( long id )
+		public string getTX( long id )
 		{	
 			Table t = this.tables[TABLE_TRANSMIT];
 			Record recordObj = t.getRecord( id );
@@ -265,12 +265,12 @@ namespace DRBDBReader.DB
 			}
 			TXRecord txrec = (TXRecord)recordObj;
 
-			string protocolTxt = this.getProtocolTextFromID( txrec.protocolid ) + "; ";
+			string protocolTxt = this.getProtocolText( txrec.protocolid ) + "; ";
 
 			return txrec.name + ": " + protocolTxt + "xmit: " + txrec.xmitstring + "; sc: " + txrec.scname;
 		}
 
-		public string getDetailedTxFromID( long id )
+		public string getDetailedTX( long id )
 		{
 			Table t = this.tables[TABLE_TRANSMIT];
 			Record recordObj = t.getRecord( id );
@@ -280,7 +280,7 @@ namespace DRBDBReader.DB
 			}
 			TXRecord txrec = (TXRecord)recordObj;
 
-			string protocolTxt = this.getProtocolTextFromID( txrec.protocolid ) + "; ";
+			string protocolTxt = this.getProtocolText( txrec.protocolid ) + "; ";
 
 			string detailText = "";
 			detailText += Environment.NewLine + "dadreqlen: " + txrec.dadreqlen + "; dadresplen: " + txrec.dadresplen + ";";
@@ -291,7 +291,7 @@ namespace DRBDBReader.DB
 			return txrec.name + ": " + protocolTxt + "xmit: " + txrec.xmitstring + "; sc: " + txrec.scname + ";" + detailText;
 		}
 
-		public string getModuleFromID( long id )
+		public string getModule( long id )
 		{
 			Table t = this.tables[TABLE_MODULE];
 			Record recordObj = t.getRecord( id );
