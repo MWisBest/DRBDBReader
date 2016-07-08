@@ -41,15 +41,15 @@ namespace DRBDBReader.DB.Units
 
 			Table sdsTable = this.db.tables[Database.TABLE_STATE_DATA_SPECIFIER];
 			Record sdsRecord = sdsTable.getRecord( this.dsid );
-			long defaultid = sdsTable.readField( sdsRecord, 1 );
-			this.defaultState = ( defaultid != 0 ? this.db.getString( defaultid ) : "" );
+			int defaultid = (int)sdsTable.readField( sdsRecord, 1 );
+			this.defaultState = ( defaultid != 0 ? this.db.getString( (ushort)defaultid ) : "" );
 
 			Table stateTable = this.db.tables[Database.TABLE_STATE_ENTRY];
 			List<ushort> recordIds = stateTable.selectRecordsReturnIDs( 3, this.dsid );
 			for( ushort i = 0; i < recordIds.Count; ++i )
 			{
 				ushort value = (ushort)stateTable.readField( stateTable.records[recordIds[i]], 1 );
-				string name = this.db.getString( stateTable.readField( stateTable.records[recordIds[i]], 0 ) );
+				string name = this.db.getString( (ushort)stateTable.readField( stateTable.records[recordIds[i]], 0 ) );
 
 				this.entries.Add( value, name );
 			}

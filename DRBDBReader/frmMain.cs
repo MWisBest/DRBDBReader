@@ -84,7 +84,8 @@ namespace DRBDBReader
 			{
 				string tofind = "";
 				string[] tofindall = null;
-				long modid, txid, stid;
+				ushort modid, stid;
+				long txid;
 				cmd = cmd.Trim();
 				this.cmdHistory.Add( cmd );
 				cmdIdx = this.cmdHistory.Count - 1;
@@ -108,11 +109,11 @@ namespace DRBDBReader
 
 						if( splitted[1].StartsWith( "0x" ) )
 						{
-							stid = long.Parse( splitted[1].Substring( 2 ), NumberStyles.HexNumber );
+							stid = ushort.Parse( splitted[1].Substring( 2 ), NumberStyles.HexNumber );
 						}
 						else
 						{
-							stid = long.Parse( splitted[1] );
+							stid = ushort.Parse( splitted[1] );
 						}
 
 						try
@@ -212,11 +213,11 @@ namespace DRBDBReader
 						{
 							if( splitted[1].StartsWith( "0x" ) )
 							{
-								modid = long.Parse( splitted[1].Substring( 2 ), NumberStyles.HexNumber );
+								modid = ushort.Parse( splitted[1].Substring( 2 ), NumberStyles.HexNumber );
 							}
 							else
 							{
-								modid = long.Parse( splitted[1] );
+								modid = ushort.Parse( splitted[1] );
 							}
 						}
 						catch
@@ -254,7 +255,7 @@ namespace DRBDBReader
 						}
 
 						this.writeBulkToConsoleStart();
-						for( long l = 0x0000L; l < 0x2000L; ++l )
+						for( ushort l = 0x0000; l < 0x2000; ++l )
 						{
 							try
 							{
@@ -306,11 +307,11 @@ namespace DRBDBReader
 						{
 							if( splitted[1].StartsWith( "0x" ) )
 							{
-								modid = long.Parse( splitted[1].Substring( 2 ), NumberStyles.HexNumber );
+								modid = ushort.Parse( splitted[1].Substring( 2 ), NumberStyles.HexNumber );
 							}
 							else
 							{
-								modid = long.Parse( splitted[1] );
+								modid = ushort.Parse( splitted[1] );
 							}
 						}
 						catch

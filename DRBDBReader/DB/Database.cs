@@ -176,9 +176,15 @@ namespace DRBDBReader.DB
 		}
 
 		private StringBuilder cachedStateBuilder = new StringBuilder();
+		private Dictionary<ushort, string> cachedStrings = new Dictionary<ushort, string>();
 
-		public string getString( long id )
+		public string getString( ushort id )
 		{
+			if( this.cachedStrings.ContainsKey( id ) )
+			{
+				return this.cachedStrings[id];
+			}
+
 			Table t = this.tables[TABLE_STATE];
 			Record recordObj = t.getRecord( id );
 			
@@ -209,7 +215,9 @@ namespace DRBDBReader.DB
 				}
 			}
 
-			return cachedStateBuilder.ToString();
+			this.cachedStrings[id] = cachedStateBuilder.ToString();
+
+			return this.cachedStrings[id];
 		}
 
 		public string getServiceCatString( ushort id )
@@ -291,7 +299,7 @@ namespace DRBDBReader.DB
 			return txrec.name + ": " + protocolTxt + "xmit: " + txrec.xmitstring + "; sc: " + txrec.scname + ";" + detailText;
 		}
 
-		public string getModule( long id )
+		public string getModule( ushort id )
 		{
 			Table t = this.tables[TABLE_MODULE];
 			Record recordObj = t.getRecord( id );
