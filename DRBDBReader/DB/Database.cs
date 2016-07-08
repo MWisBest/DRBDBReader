@@ -177,7 +177,7 @@ namespace DRBDBReader.DB
 
 		private StringBuilder cachedStateBuilder = new StringBuilder();
 
-		public string getStateString( long id )
+		public string getString( long id )
 		{
 			Table t = this.tables[TABLE_STATE];
 			Record recordObj = t.getRecord( id );

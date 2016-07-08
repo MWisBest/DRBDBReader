@@ -43,7 +43,7 @@ namespace DRBDBReader.DB.Units
 			Table ndsTable = this.db.tables[Database.TABLE_NUMERIC_DATA_SPECIFIER];
 			Record ndsRecord = ndsTable.getRecord( this.dsid );
 			this.unitid = (ushort)ndsTable.readField( ndsRecord, FIELD_NDS_UNIT );
-			this.unit = ( this.unitid != 0 ? this.db.getStateString( this.unitid ) : "" );
+			this.unit = ( this.unitid != 0 ? this.db.getString( this.unitid ) : "" );
 		}
 	}
 }

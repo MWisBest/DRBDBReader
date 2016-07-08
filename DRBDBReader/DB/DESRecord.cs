@@ -35,7 +35,7 @@ namespace DRBDBReader.DB
 
 			// get name
 			this.nameid = (ushort)this.table.readField( this, FIELD_NAME_ID );
-			string temp = this.table.db.getStateString( this.nameid );
+			string temp = this.table.db.getString( this.nameid );
 			if( temp == null )
 			{
 				temp = "(null)";

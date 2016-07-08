@@ -117,7 +117,7 @@ namespace DRBDBReader
 
 						try
 						{
-							this.writeToConsole( this.db.getStateString( stid ) + Environment.NewLine );
+							this.writeToConsole( this.db.getString( stid ) + Environment.NewLine );
 						}
 						catch
 						{
