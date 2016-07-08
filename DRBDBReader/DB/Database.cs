@@ -37,7 +37,7 @@ namespace DRBDBReader.DB
 		public const ushort TABLE_UNKNOWN_9 = 9;
 		public const ushort TABLE_MODULE_DATAELEMENT = 10;
 		public const ushort TABLE_UNKNOWN_11 = 11;
-		public const ushort TABLE_EMPTY = 12; // IDK.
+		public const ushort TABLE_EMPTY_12 = 12;
 		public const ushort TABLE_STATE_DATA_SPECIFIER = 13;
 		public const ushort TABLE_UNKNOWN_14 = 14;
 		public const ushort TABLE_STATE_ENTRY = 15;
@@ -49,8 +49,8 @@ namespace DRBDBReader.DB
 		public const ushort TABLE_UNKNOWN_21 = 21;
 		public const ushort TABLE_UNKNOWN_22 = 22;
 		public const ushort TABLE_TRANSMIT = 23;
-		public const ushort TABLE_UNKNOWN_24 = 24;
-		public const ushort TABLE_UNKNOWN_25 = 25;
+		public const ushort TABLE_EMPTY_24 = 24;
+		public const ushort TABLE_EMPTY_25 = 25;
 		public const ushort TABLE_DBTEXT_1 = 26;
 		public const ushort TABLE_DBTEXT_2 = 27;
 
@@ -64,7 +64,9 @@ namespace DRBDBReader.DB
 			TABLE_DBTEXT_2,
 			TABLE_STATE,
 
-			TABLE_EMPTY,
+			TABLE_EMPTY_12,
+			TABLE_EMPTY_24,
+			TABLE_EMPTY_25,
 			TABLE_UNKNOWN_3,
 			TABLE_UNKNOWN_9,
 			TABLE_UNKNOWN_11,
@@ -73,8 +75,6 @@ namespace DRBDBReader.DB
 			TABLE_UNKNOWN_20,
 			TABLE_UNKNOWN_21,
 			TABLE_UNKNOWN_22,
-			TABLE_UNKNOWN_24,
-			TABLE_UNKNOWN_25,
 
 			TABLE_BINARY_DATA_SPECIFIER,
 			TABLE_NUMERIC_DATA_SPECIFIER,
