@@ -17,10 +17,13 @@
  */
 namespace DRBDBReader.DB.Units
 {
-	public class BinaryStateConverter : Converter
+	public enum Operator : byte
 	{
-		public BinaryStateConverter( Database db, byte[] record, ushort cfid, ushort dsid ) : base( db, record, cfid, dsid )
-		{
-		}
+		EQUAL = 0x3D,
+		NOT_EQUAL = 0x21,
+		GREATER = 0x3E,
+		LESS = 0x3C,
+		MASK_ZERO = 0x30,
+		MASK_NOT_ZERO = 0x39
 	}
 }

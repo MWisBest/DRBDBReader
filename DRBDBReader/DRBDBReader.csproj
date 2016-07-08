@@ -58,6 +58,7 @@
     <Compile Include="DB\ServiceCatRecord.cs" />
     <Compile Include="DB\Table.cs" />
     <Compile Include="DB\TXRecord.cs" />
+    <Compile Include="DB\Units\Operator.cs" />
     <Compile Include="DB\Units\StateConverter.cs" />
     <Compile Include="frmMain.cs">
       <SubType>Form</SubType>

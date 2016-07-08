@@ -15,32 +15,43 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-using System;
+using System.Collections.Generic;
 
 namespace DRBDBReader.DB.Units
 {
 	public class StateConverter : Converter
 	{
-		private const byte FIELD_SCF_MASK = 1;
-		private const byte FIELD_SCF_OP = 2;
+		private const byte FIELD_MASK = 1;
+		private const byte FIELD_OP = 2;
 
-		public char op = '=';
-		public ushort mask = 0xFFFF;
+		public Operator op;
+		public ushort mask;
+
+		public string defaultState;
+		public Dictionary<ushort, string> entries;
 
 		public StateConverter( Database db, byte[] record, ushort cfid, ushort dsid ) : base( db, record, cfid, dsid )
 		{
 			Table stateConvTable = this.db.tables[Database.TABLE_CONVERTERS_STATE];
 			Record stateConvRecord = stateConvTable.getRecord( this.cfid );
 
-			if( stateConvRecord != null )
+			this.mask = (ushort)stateConvTable.readField( stateConvRecord, FIELD_MASK );
+			this.op = (Operator)( (byte)( ( (ushort)stateConvTable.readField( stateConvRecord, FIELD_OP ) ) >> 8 ) );
+			this.entries = new Dictionary<ushort, string>();
+
+			Table sdsTable = this.db.tables[Database.TABLE_STATE_DATA_SPECIFIER];
+			Record sdsRecord = sdsTable.getRecord( this.dsid );
+			long defaultid = sdsTable.readField( sdsRecord, 1 );
+			this.defaultState = ( defaultid != 0 ? this.db.getStateString( defaultid ) : "" );
+
+			Table stateTable = this.db.tables[Database.TABLE_STATE_ENTRY];
+			List<ushort> recordIds = stateTable.selectRecordsReturnIDs( 3, this.dsid );
+			for( ushort i = 0; i < recordIds.Count; ++i )
 			{
-				this.mask = (ushort)stateConvTable.readField( stateConvRecord, FIELD_SCF_MASK );
-				this.op = Convert.ToChar( (byte)( ( (ushort)stateConvTable.readField( stateConvRecord, FIELD_SCF_OP ) ) >> 8 ) );
-				;
-			}
-			else
-			{
-				;
+				ushort value = (ushort)stateTable.readField( stateTable.records[recordIds[i]], 1 );
+				string name = this.db.getStateString( stateTable.readField( stateTable.records[recordIds[i]], 0 ) );
+
+				this.entries.Add( value, name );
 			}
 		}
 	}
