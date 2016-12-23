@@ -15,14 +15,20 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+using System;
 using System.Collections.Generic;
 
 namespace DRBDBReader.DB.Units
 {
 	public class StateConverter : Converter
 	{
-		private const byte FIELD_MASK = 1;
-		private const byte FIELD_OP = 2;
+		private const byte FIELD_SC_MASK = 1;
+		private const byte FIELD_SC_OP = 2;
+
+		private const byte FIELD_SDS_DEFSTR_ID = 1;
+
+		private const byte FIELD_SE_STR_ID = 0;
+		private const byte FIELD_SE_VALUE = 1;
 
 		public Operator op;
 		public ushort mask;
@@ -35,24 +41,43 @@ namespace DRBDBReader.DB.Units
 			Table stateConvTable = this.db.tables[Database.TABLE_CONVERTERS_STATE];
 			Record stateConvRecord = stateConvTable.getRecord( this.cfid );
 
-			this.mask = (ushort)stateConvTable.readField( stateConvRecord, FIELD_MASK );
-			this.op = (Operator)( (byte)( ( (ushort)stateConvTable.readField( stateConvRecord, FIELD_OP ) ) >> 8 ) );
+			this.mask = (ushort)stateConvTable.readField( stateConvRecord, FIELD_SC_MASK );
+			this.op = (Operator)( (byte)( ( (ushort)stateConvTable.readField( stateConvRecord, FIELD_SC_OP ) ) >> 8 ) );
 			this.entries = new Dictionary<ushort, string>();
+			this.buildStateList();
+		}
 
+		protected virtual void buildStateList()
+		{
 			Table sdsTable = this.db.tables[Database.TABLE_STATE_DATA_SPECIFIER];
 			Record sdsRecord = sdsTable.getRecord( this.dsid );
-			int defaultid = (int)sdsTable.readField( sdsRecord, 1 );
-			this.defaultState = ( defaultid != 0 ? this.db.getString( (ushort)defaultid ) : "" );
+			int defaultid = (int)sdsTable.readField( sdsRecord, FIELD_SDS_DEFSTR_ID );
+			this.defaultState = ( defaultid != 0 ? this.db.getString( (ushort)defaultid ) : "N/A" );
 
 			Table stateTable = this.db.tables[Database.TABLE_STATE_ENTRY];
 			List<ushort> recordIds = stateTable.selectRecordsReturnIDs( 3, this.dsid );
 			for( ushort i = 0; i < recordIds.Count; ++i )
 			{
-				ushort value = (ushort)stateTable.readField( stateTable.records[recordIds[i]], 1 );
-				string name = this.db.getString( (ushort)stateTable.readField( stateTable.records[recordIds[i]], 0 ) );
+				ushort value = (ushort)stateTable.readField( stateTable.records[recordIds[i]], FIELD_SE_VALUE );
+				string name = this.db.getString( (ushort)stateTable.readField( stateTable.records[recordIds[i]], FIELD_SE_STR_ID ) );
 
 				this.entries.Add( value, name );
 			}
+		}
+
+		public override string processData( byte[] data )
+		{
+			ushort entryID = this.getEntryID( data );
+			if( this.entries.ContainsKey( entryID ) )
+			{
+				return this.entries[entryID];
+			}
+			return this.defaultState;
+		}
+
+		protected virtual ushort getEntryID( byte[] data )
+		{
+			return (ushort)( BitConverter.ToUInt16( data, 0 ) & this.mask );
 		}
 	}
 }

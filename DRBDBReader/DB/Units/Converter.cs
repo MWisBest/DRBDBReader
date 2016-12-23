@@ -31,5 +31,10 @@ namespace DRBDBReader.DB.Units
 			this.cfid = cfid;
 			this.dsid = dsid;
 		}
+
+		public virtual string processData( byte[] data )
+		{
+			return "(null)";
+		}
 	}
 }

@@ -19,6 +19,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Windows.Forms;
 using DRBDBReader.DB;
 
@@ -157,6 +158,42 @@ namespace DRBDBReader
 
 						this.txtConsoleInput.Focus();
 						this.txtConsoleInput.AppendText( "txid " + splitted[1] );
+
+						break;
+					case "txrunconverter":
+						this.checkDB();
+
+						string[] txconvsplit = splitted[1].Split( new char[] { ' ' }, 2 );
+
+
+						try
+						{
+							if( txconvsplit[0].StartsWith( "0x" ) )
+							{
+								txid = long.Parse( txconvsplit[0].Substring( 2 ), NumberStyles.HexNumber );
+							}
+							else
+							{
+								txid = long.Parse( txconvsplit[0] );
+							}
+						}
+						catch
+						{
+							this.writeToConsole( "Error in command." + Environment.NewLine );
+							return;
+						}
+
+						byte[] convdata = Enumerable.Range( 0, txconvsplit[1].Length )
+							.Where( x => x % 2 == 0 )
+							.Select( x => Convert.ToByte( txconvsplit[1].Substring( x, 2 ), 16 ) )
+							.ToArray();
+
+						Table txconvtable = this.db.tables[Database.TABLE_TRANSMIT];
+						TXRecord txconvrec = (TXRecord)txconvtable.getRecord( txid );
+
+						string result = txconvrec.converter.processData( convdata );
+
+						this.writeToConsole( result + Environment.NewLine );
 
 						break;
 					case "txsearch":
