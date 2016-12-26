@@ -45,5 +45,12 @@ namespace DRBDBReader.DB.Units
 			this.unitid = (ushort)ndsTable.readField( ndsRecord, FIELD_NDS_UNIT );
 			this.unit = ( this.unitid != 0 ? this.db.getString( this.unitid ) : "" );
 		}
+
+		public override string processData( byte[] data )
+		{
+			int val = BitConverter.ToInt32( data, 0 );
+			double result = val * this.slope + this.offset;
+			return result + " " + this.unit;
+		}
 	}
 }
