@@ -82,6 +82,11 @@ namespace DRBDBReader.DB
 				case 32:
 					this.converter = new StateConverter( this.table.db, convertfield, cfid, dsid );
 					break;
+				case 2:
+				case 18:
+				case 34:
+					this.converter = new UnknownConverter( this.table.db, convertfield, cfid, dsid );
+					break;
 				default:
 					this.converter = new Converter( this.table.db, convertfield, cfid, dsid );
 					break;
