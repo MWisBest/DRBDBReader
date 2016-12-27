@@ -258,6 +258,8 @@ namespace DRBDBReader.DB
 					return "J1850";
 				case 53:
 					return "CCD";
+				case 160:
+					return "?J2190?";
 				default:
 					return "P" + id;
 			}
