@@ -77,7 +77,12 @@ namespace DRBDBReader.DB.Units
 
 		protected virtual ushort getEntryID( byte[] data )
 		{
-			return (ushort)( BitConverter.ToUInt16( data, 0 ) & this.mask );
+			ushort id = BitConverter.ToUInt16( data, 0 );
+			if( this.mask != 0 )
+			{
+				id = (ushort)( id & this.mask );
+			}
+			return id;
 		}
 	}
 }
