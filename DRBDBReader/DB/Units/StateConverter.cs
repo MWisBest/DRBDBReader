@@ -65,9 +65,9 @@ namespace DRBDBReader.DB.Units
 			}
 		}
 
-		public override string processData( byte[] data )
+		public override string processData( long data )
 		{
-			ushort entryID = this.getEntryID( data );
+			ushort entryID = this.getEntryID( (ushort)data );
 			if( this.entries.ContainsKey( entryID ) )
 			{
 				return this.entries[entryID];
@@ -75,14 +75,13 @@ namespace DRBDBReader.DB.Units
 			return this.defaultState;
 		}
 
-		protected virtual ushort getEntryID( byte[] data )
+		protected virtual ushort getEntryID( ushort val )
 		{
-			ushort id = BitConverter.ToUInt16( data, 0 );
 			if( this.mask != 0 )
 			{
-				id = (ushort)( id & this.mask );
+				val = (ushort)( val & this.mask );
 			}
-			return id;
+			return val;
 		}
 	}
 }

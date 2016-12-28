@@ -43,7 +43,7 @@ namespace DRBDBReader.DB.Units
 			}
 		}
 
-		public override string processData( byte[] data )
+		public override string processData( long data )
 		{
 			return "type: " + this.record[0] + "; rec: " + BitConverter.ToString( this.record ) + "; dsrec: " + BitConverter.ToString( this.dsrec.record );
 		}

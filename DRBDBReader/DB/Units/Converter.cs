@@ -32,7 +32,7 @@ namespace DRBDBReader.DB.Units
 			this.dsid = dsid;
 		}
 
-		public virtual string processData( byte[] data )
+		public virtual string processData( long data )
 		{
 			return "(null)";
 		}

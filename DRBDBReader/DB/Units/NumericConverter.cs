@@ -46,10 +46,9 @@ namespace DRBDBReader.DB.Units
 			this.unit = ( this.unitid != 0 ? this.db.getString( this.unitid ) : "" );
 		}
 
-		public override string processData( byte[] data )
+		public override string processData( long data )
 		{
-			int val = BitConverter.ToInt32( data, 0 );
-			double result = val * this.slope + this.offset;
+			double result = data * this.slope + this.offset;
 			return result + " " + this.unit;
 		}
 	}

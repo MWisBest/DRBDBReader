@@ -40,9 +40,8 @@ namespace DRBDBReader.DB.Units
 			this.entries.Add( 1, stateTrue );
 		}
 
-		protected override ushort getEntryID( byte[] data )
+		protected override ushort getEntryID( ushort val )
 		{
-			int val = BitConverter.ToInt32( data, 0 );
 			switch( this.op )
 			{
 				case Operator.GREATER:
