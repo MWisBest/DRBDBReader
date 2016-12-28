@@ -258,8 +258,12 @@ namespace DRBDBReader.DB
 					return "J1850";
 				case 53:
 					return "CCD";
+				case 60:
+					return "SCI";
+				case 159:
+					return "Multimeter";
 				case 160:
-					return "?J2190?";
+					return "J2190?";
 				default:
 					return "P" + id;
 			}
