@@ -1,6 +1,6 @@
 ﻿/*
  * DRBDBReader
- * Copyright (C) 2016, Kyle Repinski
+ * Copyright (C) 2016-2017, Kyle Repinski
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,6 +21,7 @@ using System.Globalization;
 using System.IO;
 using System.Windows.Forms;
 using DRBDBReader.DB;
+using DRBDBReader.DB.Units;
 
 namespace DRBDBReader
 {
@@ -107,56 +108,17 @@ namespace DRBDBReader
 					case "stringid":
 						this.checkDB();
 
-						if( splitted[1].StartsWith( "0x" ) )
-						{
-							stid = ushort.Parse( splitted[1].Substring( 2 ), NumberStyles.HexNumber );
-						}
-						else
-						{
-							stid = ushort.Parse( splitted[1] );
-						}
+						stid = Util.parseUShort( splitted[1] );
 
-						try
-						{
-							this.writeToConsole( this.db.getString( stid ) + Environment.NewLine );
-						}
-						catch
-						{
-							this.writeToConsole( "Error in command." + Environment.NewLine );
-						}
+						this.writeToConsole( this.db.getString( stid ) + Environment.NewLine );
 
 						break;
 					case "txid":
 						this.checkDB();
 
-						try
-						{
-							if( splitted[1].StartsWith( "0x" ) )
-							{
-								txid = long.Parse( splitted[1].Substring( 2 ), NumberStyles.HexNumber );
-							}
-							else
-							{
-								txid = long.Parse( splitted[1] );
-							}
-						}
-						catch
-						{
-							this.writeToConsole( "Error in command." + Environment.NewLine );
-							return;
-						}
+						txid = Util.parseLong( splitted[1] );
 
-						try
-						{
-							this.writeToConsole( this.db.getDetailedTX( txid ) + Environment.NewLine );
-						}
-						catch
-						{
-							this.writeToConsole( "Error in command." + Environment.NewLine );
-						}
-
-						this.txtConsoleInput.Focus();
-						this.txtConsoleInput.AppendText( "txid " + splitted[1] );
+						this.writeToConsole( this.db.getDetailedTX( txid ) + Environment.NewLine );
 
 						break;
 					case "txrunconverter":
@@ -165,31 +127,8 @@ namespace DRBDBReader
 						string[] txconvsplit = splitted[1].Split( new char[] { ' ' }, 2 );
 						long convdata = 0;
 
-						try
-						{
-							if( txconvsplit[0].StartsWith( "0x" ) )
-							{
-								txid = long.Parse( txconvsplit[0].Substring( 2 ), NumberStyles.HexNumber );
-							}
-							else
-							{
-								txid = long.Parse( txconvsplit[0] );
-							}
-
-							if( txconvsplit[1].StartsWith( "0x" ) )
-							{
-								convdata = long.Parse( txconvsplit[1].Substring( 2 ), NumberStyles.HexNumber );
-							}
-							else
-							{
-								convdata = long.Parse( txconvsplit[1] );
-							}
-						}
-						catch
-						{
-							this.writeToConsole( "Error in command." + Environment.NewLine );
-							return;
-						}
+						txid = Util.parseLong( txconvsplit[0] );
+						convdata = Util.parseLong( txconvsplit[1] );
 
 						Table txconvtable = this.db.tables[Database.TABLE_TRANSMIT];
 						TXRecord txconvrec = (TXRecord)txconvtable.getRecord( txid );
@@ -246,25 +185,34 @@ namespace DRBDBReader
 						this.writeBulkToConsoleEnd();
 
 						break;
+					case "dumpstateconverter":
+						this.checkDB();
+
+						txid = Util.parseLong( splitted[1] );
+
+						Table dtcdumptxconvtable = this.db.tables[Database.TABLE_TRANSMIT];
+						TXRecord dtcdumptxconvrec = (TXRecord)dtcdumptxconvtable.getRecord( txid );
+
+						if( dtcdumptxconvrec.converter is StateConverter )
+						{
+							StateConverter dtcdumpconv = (StateConverter)dtcdumptxconvrec.converter;
+							this.writeBulkToConsoleStart();
+							foreach( KeyValuePair<ushort, string> kvp in dtcdumpconv.entries )
+							{
+								this.writeBulkToConsole( kvp.Key.ToString() + ": " + kvp.Value );
+							}
+							this.writeBulkToConsoleEnd();
+						}
+						else
+						{
+							this.writeToConsole( "Not a StateConverter." );
+						}
+
+						break;
 					case "modid":
 						this.checkDB();
 
-						try
-						{
-							if( splitted[1].StartsWith( "0x" ) )
-							{
-								modid = ushort.Parse( splitted[1].Substring( 2 ), NumberStyles.HexNumber );
-							}
-							else
-							{
-								modid = ushort.Parse( splitted[1] );
-							}
-						}
-						catch
-						{
-							this.writeToConsole( "Error in command." + Environment.NewLine );
-							return;
-						}
+						modid = Util.parseUShort( splitted[1] );
 
 						string modresult = this.db.getModule( modid );
 
@@ -343,22 +291,7 @@ namespace DRBDBReader
 					case "modtxlist":
 						this.checkDB();
 
-						try
-						{
-							if( splitted[1].StartsWith( "0x" ) )
-							{
-								modid = ushort.Parse( splitted[1].Substring( 2 ), NumberStyles.HexNumber );
-							}
-							else
-							{
-								modid = ushort.Parse( splitted[1] );
-							}
-						}
-						catch
-						{
-							this.writeToConsole( "Error in command." + Environment.NewLine );
-							return;
-						}
+						modid = Util.parseUShort( splitted[1] );
 
 						Record rec = this.db.tables[Database.TABLE_MODULE].getRecord( modid );
 						if( rec != null )
@@ -369,8 +302,7 @@ namespace DRBDBReader
 							foreach( TXRecord txrec in modrec.dataelements )
 							{
 								string temp = this.db.getTX( txrec.id );
-								//if( temp.Contains( "J1850" ) )
-									this.writeBulkToConsole( temp + "; 0x" + txrec.id.ToString( "x" ) );
+								this.writeBulkToConsole( temp + "; 0x" + txrec.id.ToString( "x" ) );
 							}
 
 							this.writeBulkToConsoleEnd();
