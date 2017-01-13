@@ -23,7 +23,7 @@ namespace DRBDBReader
 	{
 		public static long parseLong( string input )
 		{
-			string lower = input.ToLower();
+			string lower = input.ToLower().Replace( "_", "" );
 			long ret;
 
 			if( lower.StartsWith( "0x" ) )
@@ -48,7 +48,7 @@ namespace DRBDBReader
 
 		public static ushort parseUShort( string input )
 		{
-			string lower = input.ToLower();
+			string lower = input.ToLower().Replace( "_", "" );
 			ushort ret;
 
 			if( lower.StartsWith( "0x" ) )
