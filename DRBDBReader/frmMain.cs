@@ -208,6 +208,43 @@ namespace DRBDBReader
 						}
 
 						break;
+					case "dumptableinfo":
+						this.checkDB();
+
+						ushort tableNum = Util.parseUShort( splitted[1] );
+
+						Table t = this.db.tables[tableNum];
+						string toPrint = "";
+
+						toPrint += "Table: " + tableNum + "; Columns: " + t.colCount + "; Rows: " + t.rowCount + ";" + Environment.NewLine;
+						toPrint += "ColSizes: " + BitConverter.ToString( t.colSizes ) + "; RowSize: " + t.rowSize + ";" + Environment.NewLine;
+
+						this.writeToConsole( toPrint );
+
+						break;
+					case "stringidfuzz":
+						this.checkDB();
+
+						string[] fuzzsplit = splitted[1].Split( new char[] { ' ' }, 2 );
+
+						ushort tableNumTwo = Util.parseUShort( fuzzsplit[0] );
+						byte tableCol = (byte)Util.parseUShort( fuzzsplit[1] );
+						Table tt = this.db.tables[tableNumTwo];
+						int hits = 0;
+
+						foreach( Record fuzzrec in tt.records )
+						{
+							ushort fuzzfield = (ushort)tt.readField( fuzzrec, tableCol );
+							string fuzzstring = this.db.getString( fuzzfield );
+							if( fuzzstring != "(null)" )
+							{
+								++hits;
+							}
+						}
+
+						this.writeToConsole( "Records: " + tt.records.Length + "; Hits: " + hits + Environment.NewLine );
+
+						break;
 					case "modid":
 						this.checkDB();
 

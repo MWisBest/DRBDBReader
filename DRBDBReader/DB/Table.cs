@@ -1,6 +1,6 @@
 ﻿/*
  * DRBDBReader
- * Copyright (C) 2016, Kyle Repinski
+ * Copyright (C) 2016-2017, Kyle Repinski
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,10 +25,10 @@ namespace DRBDBReader.DB
 	{
 		public uint offset;
 		private ushort id;
-		private ushort rowCount;
+		public ushort rowCount;
 		public ushort rowSize;
-		private byte colCount;
-		private byte[] colSizes;
+		public byte colCount;
+		public byte[] colSizes;
 		public Record[] records;
 		public Database db;
 
