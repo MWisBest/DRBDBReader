@@ -1,6 +1,6 @@
 ﻿/*
  * DRBDBReader
- * Copyright (C) 2016, Kyle Repinski
+ * Copyright (C) 2016-2017, Kyle Repinski
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,15 +15,32 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-namespace DRBDBReader.DB.Units
+namespace DRBDBReader.DB.Records
 {
-	public enum Operator : byte
+	public class ServiceCatRecord : Record
 	{
-		EQUAL = 0x3D,
-		NOT_EQUAL = 0x21,
-		GREATER = 0x3E,
-		LESS = 0x3C,
-		MASK_ZERO = 0x30,
-		MASK_NOT_ZERO = 0x39
+		private const byte FIELD_NAMEID = 1;
+		private const byte FIELD_SCID = 3;
+
+		public ushort nameid;
+		public string name;
+
+		public ushort scid;
+
+		public ServiceCatRecord( Table table, byte[] record ) : base( table, record )
+		{
+			// get (sc) id
+			this.scid = (ushort)this.table.readField( this, FIELD_SCID );
+
+
+			// get name
+			this.nameid = (ushort)this.table.readField( this, FIELD_NAMEID );
+			string temp = this.table.db.getString( this.nameid );
+			if( temp == null )
+			{
+				temp = "(null)";
+			}
+			this.name = temp;
+		}
 	}
 }

@@ -1,6 +1,6 @@
 ﻿/*
  * DRBDBReader
- * Copyright (C) 2016, Kyle Repinski
+ * Copyright (C) 2016-2017, Kyle Repinski
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,6 +20,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using DRBDBReader.DB.Records;
 
 namespace DRBDBReader.DB
 {

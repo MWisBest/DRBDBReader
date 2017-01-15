@@ -1,6 +1,6 @@
 ﻿/*
  * DRBDBReader
- * Copyright (C) 2016, Kyle Repinski
+ * Copyright (C) 2016-2017, Kyle Repinski
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,8 +16,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 using System;
+using DRBDBReader.DB.Records;
 
-namespace DRBDBReader.DB.Units
+namespace DRBDBReader.DB.Converters
 {
 	public class UnknownConverter : Converter
 	{

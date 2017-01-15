@@ -1,6 +1,6 @@
 ﻿/*
  * DRBDBReader
- * Copyright (C) 2016, Kyle Repinski
+ * Copyright (C) 2016-2017, Kyle Repinski
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,10 +16,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 using System;
+using DRBDBReader.DB.Converters;
 
-using DRBDBReader.DB.Units;
-
-namespace DRBDBReader.DB
+namespace DRBDBReader.DB.Records
 {
 	public class TXRecord : Record
 	{
@@ -67,7 +66,7 @@ namespace DRBDBReader.DB
 
 			// get converter info
 			byte[] convertfield = this.table.readFieldRaw( this, FIELD_CONVERSION );
-			
+
 			ushort dsid = (ushort)this.table.readInternal( convertfield, 2, 2 );
 			ushort cfid = (ushort)this.table.readInternal( convertfield, 4, 2 );
 

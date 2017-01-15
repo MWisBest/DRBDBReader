@@ -16,8 +16,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 using System.Collections.Generic;
+using DRBDBReader.DB.Records;
 
-namespace DRBDBReader.DB.Units
+namespace DRBDBReader.DB.Converters
 {
 	public class StateConverter : Converter
 	{

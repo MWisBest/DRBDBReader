@@ -1,6 +1,6 @@
 ﻿/*
  * DRBDBReader
- * Copyright (C) 2016, Kyle Repinski
+ * Copyright (C) 2016-2017, Kyle Repinski
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
  */
 using System.Collections.Generic;
 
-namespace DRBDBReader.DB
+namespace DRBDBReader.DB.Records
 {
 	public class ModuleRecord : Record
 	{
