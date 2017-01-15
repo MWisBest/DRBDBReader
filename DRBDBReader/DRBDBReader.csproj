@@ -55,6 +55,7 @@
     <Compile Include="DB\Records\ModuleRecord.cs" />
     <Compile Include="DB\Converters\NumericConverter.cs" />
     <Compile Include="DB\Records\Record.cs" />
+    <Compile Include="DB\Records\RecordUnknownStringTwo.cs" />
     <Compile Include="DB\Records\ServiceCatRecord.cs" />
     <Compile Include="DB\Table.cs" />
     <Compile Include="DB\Records\TXRecord.cs" />

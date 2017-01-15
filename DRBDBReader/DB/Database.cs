@@ -35,7 +35,7 @@ namespace DRBDBReader.DB
 		public const ushort TABLE_SERIVCE_CAT_STUFFS = 6; // lolidk
 		public const ushort TABLE_QUALIFIER = 7;
 		public const ushort TABLE_DATA_ACQUISITION_DESCRIPTION = 8;
-		public const ushort TABLE_UNKNOWN_9 = 9;
+		public const ushort TABLE_DRB_MENU = 9;
 		public const ushort TABLE_MODULE_DATAELEMENT = 10;
 		public const ushort TABLE_UNKNOWN_11 = 11;
 		public const ushort TABLE_EMPTY_12 = 12;
@@ -68,13 +68,12 @@ namespace DRBDBReader.DB
 			TABLE_EMPTY_12,
 			TABLE_EMPTY_24,
 			TABLE_EMPTY_25,
-			TABLE_UNKNOWN_3,
-			TABLE_UNKNOWN_9,
+			TABLE_UNKNOWN_3,  // Field 2: string id
 			TABLE_UNKNOWN_11,
 			TABLE_UNKNOWN_14,
 			TABLE_UNKNOWN_19,
-			TABLE_UNKNOWN_20,
-			TABLE_UNKNOWN_21,
+			TABLE_UNKNOWN_20, // Field 2: looks like string id but isn't
+			TABLE_UNKNOWN_21, // Field 2: looks like string id but isn't
 			TABLE_UNKNOWN_22,
 
 			TABLE_BINARY_DATA_SPECIFIER,
@@ -87,6 +86,7 @@ namespace DRBDBReader.DB
 			TABLE_STATE_ENTRY,
 			TABLE_QUALIFIER,
 			TABLE_DATAELEMENT_QUALIFIER,
+			TABLE_DRB_MENU,
 
 			TABLE_DES_INFO, // must come before TABLE_TRANSMIT, maybe others?
 			TABLE_SERIVCE_CAT_STUFFS, // must come before TABLE_TRANSMIT

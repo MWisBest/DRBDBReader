@@ -84,6 +84,13 @@ namespace DRBDBReader.DB
 						records[i] = new ModuleRecord( this, this.db.reader.ReadBytes( this.rowSize ) );
 					}
 					break;
+				case Database.TABLE_UNKNOWN_3:
+				case Database.TABLE_DRB_MENU:
+					for( ushort i = 0; i < this.rowCount; ++i )
+					{
+						records[i] = new RecordUnknownStringTwo( this, this.db.reader.ReadBytes( this.rowSize ) );
+					}
+					break;
 				default:
 					for( ushort i = 0; i < this.rowCount; ++i )
 					{
