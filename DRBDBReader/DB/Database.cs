@@ -73,7 +73,7 @@ namespace DRBDBReader.DB
 			TABLE_UNKNOWN_14,
 			TABLE_UNKNOWN_19,
 			TABLE_UNKNOWN_20, // Field 2: looks like string id but isn't
-			TABLE_UNKNOWN_21, // Field 2: looks like string id but isn't
+			TABLE_UNKNOWN_21, // Field 3: string id
 			TABLE_UNKNOWN_22,
 
 			TABLE_BINARY_DATA_SPECIFIER,

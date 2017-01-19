@@ -98,6 +98,12 @@ namespace DRBDBReader.DB
 						records[i] = new RecordUnknownWithString( this, this.db.reader.ReadBytes( this.rowSize ), 2 );
 					}
 					break;
+				case Database.TABLE_UNKNOWN_21:
+					for( ushort i = 0; i < this.rowCount; ++i )
+					{
+						records[i] = new RecordUnknownWithString( this, this.db.reader.ReadBytes( this.rowSize ), 3 );
+					}
+					break;
 				default:
 					for( ushort i = 0; i < this.rowCount; ++i )
 					{
