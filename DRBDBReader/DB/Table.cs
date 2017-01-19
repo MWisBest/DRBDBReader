@@ -117,8 +117,9 @@ namespace DRBDBReader.DB
 
 		public Record getRecord( long key, byte idcol = 0, bool sorted = true )
 		{
-			/* Check the cached results first. */
-			if( this.idToRecordCache.ContainsKey( key ) )
+			/* Check the cached results first.
+			 * If idcol is not 0 we won't cache, just so there's no collisions */
+			if( idcol == 0 && this.idToRecordCache.ContainsKey( key ) )
 			{
 				return this.records[this.idToRecordCache[key]];
 			}
@@ -140,7 +141,10 @@ namespace DRBDBReader.DB
 
 					if( val == key )
 					{
-						this.idToRecordCache[key] = mid;
+						if( idcol == 0 )
+						{
+							this.idToRecordCache[key] = mid;
+						}
 						return this.records[mid];
 					}
 
@@ -164,7 +168,10 @@ namespace DRBDBReader.DB
 
 					if( val == key )
 					{
-						this.idToRecordCache[key] = i;
+						if( idcol == 0 )
+						{
+							this.idToRecordCache[key] = i;
+						}
 						return this.records[i];
 					}
 				}
