@@ -52,10 +52,11 @@
     <Compile Include="DB\Converters\Converter.cs" />
     <Compile Include="DB\Database.cs" />
     <Compile Include="DB\Records\DESRecord.cs" />
+    <Compile Include="DB\Records\MenuRecord.cs" />
     <Compile Include="DB\Records\ModuleRecord.cs" />
     <Compile Include="DB\Converters\NumericConverter.cs" />
     <Compile Include="DB\Records\Record.cs" />
-    <Compile Include="DB\Records\RecordUnknownStringTwo.cs" />
+    <Compile Include="DB\Records\RecordUnknownWithString.cs" />
     <Compile Include="DB\Records\ServiceCatRecord.cs" />
     <Compile Include="DB\Table.cs" />
     <Compile Include="DB\Records\TXRecord.cs" />

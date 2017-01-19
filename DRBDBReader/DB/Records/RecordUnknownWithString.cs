@@ -17,29 +17,30 @@
  */
 namespace DRBDBReader.DB.Records
 {
-	public class RecordUnknownStringTwo : Record
+	public class RecordUnknownWithString : Record
 	{
 		private const byte FIELD_ID = 0;
-		private const byte FIELD_NAME_ID = 2;
+		public byte stringidcol;
 
 		public ushort id;
 
-		public string name;
-		public ushort nameid;
+		public string str;
+		public ushort strid;
 
-		public RecordUnknownStringTwo( Table table, byte[] record ) : base( table, record )
+		public RecordUnknownWithString( Table table, byte[] record, byte stringidcol ) : base( table, record )
 		{
+			this.stringidcol = stringidcol;
 			// get id
 			this.id = (ushort)this.table.readField( this, FIELD_ID );
 
-			// get name
-			this.nameid = (ushort)this.table.readField( this, FIELD_NAME_ID );
-			string temp = this.table.db.getString( this.nameid );
+			// get string
+			this.strid = (ushort)this.table.readField( this, this.stringidcol );
+			string temp = this.table.db.getString( this.strid );
 			if( temp == null )
 			{
 				temp = "(null)";
 			}
-			this.name = temp;
+			this.str = temp;
 		}
 	}
 }

@@ -32,6 +32,7 @@ namespace DRBDBReader.DB
 		public byte[] colSizes;
 		public Record[] records;
 		public Database db;
+		private Dictionary<long, int> idToRecordCache;
 
 		// This saves us a ridiculous amount of memory.
 		// GC catches it otherwise of course, but without this
@@ -49,6 +50,7 @@ namespace DRBDBReader.DB
 			this.colCount = colCount;
 			this.colSizes = colSizes;
 			this.records = new Record[rowCount];
+			this.idToRecordCache = new Dictionary<long, int>();
 		}
 
 		public void readRecords()
@@ -84,11 +86,16 @@ namespace DRBDBReader.DB
 						records[i] = new ModuleRecord( this, this.db.reader.ReadBytes( this.rowSize ) );
 					}
 					break;
-				case Database.TABLE_UNKNOWN_3:
 				case Database.TABLE_DRB_MENU:
 					for( ushort i = 0; i < this.rowCount; ++i )
 					{
-						records[i] = new RecordUnknownStringTwo( this, this.db.reader.ReadBytes( this.rowSize ) );
+						records[i] = new MenuRecord( this, this.db.reader.ReadBytes( this.rowSize ) );
+					}
+					break;
+				case Database.TABLE_UNKNOWN_3:
+					for( ushort i = 0; i < this.rowCount; ++i )
+					{
+						records[i] = new RecordUnknownWithString( this, this.db.reader.ReadBytes( this.rowSize ), 2 );
 					}
 					break;
 				default:
@@ -102,33 +109,60 @@ namespace DRBDBReader.DB
 			this.db.reader.BaseStream.Seek( tempPos, SeekOrigin.Begin );
 		}
 
-		public Record getRecord( long key, byte idcol = 0 )
+		public Record getRecord( long key, byte idcol = 0, bool sorted = true )
 		{
-			int min = 0;
-			int max = this.rowCount - 1;
-			int mid = ( min + max ) / 2;
+			/* Check the cached results first. */
+			if( this.idToRecordCache.ContainsKey( key ) )
+			{
+				return this.records[this.idToRecordCache[key]];
+			}
+
 			long val = 0L;
 
-			do
+			/* If the ID field is sorted (normally the case), the search can be
+			 * sped up by continuously cutting the search in half until the record
+			 * is found (e.x. if it's looking for ID 300, and it just tested ID 200,
+			 * it can cut every record below ID 200 from the search and continue) */
+			if( sorted )
 			{
-				val = this.readField( this.records[mid], idcol );
-
-				if( val == key )
+				int min = 0;
+				int max = this.rowCount - 1;
+				int mid = ( min + max ) / 2;
+				do
 				{
-					return this.records[mid];
-				}
+					val = this.readField( this.records[mid], idcol );
 
-				if( val < key )
-				{
-					min = mid + 1;
-				}
-				else
-				{
-					max = mid - 1;
-				}
+					if( val == key )
+					{
+						this.idToRecordCache[key] = mid;
+						return this.records[mid];
+					}
 
-				mid = ( min + max ) / 2;
-			} while( min <= max );
+					if( val < key )
+					{
+						min = mid + 1;
+					}
+					else
+					{
+						max = mid - 1;
+					}
+
+					mid = ( min + max ) / 2;
+				} while( min <= max );
+			}
+			else
+			{
+				for( int i = 0; i < this.records.Length; ++i )
+				{
+					val = this.readField( this.records[i], idcol );
+
+					if( val == key )
+					{
+						this.idToRecordCache[key] = i;
+						return this.records[i];
+					}
+				}
+			}
 
 			return null;
 		}
