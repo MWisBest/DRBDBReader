@@ -58,7 +58,8 @@ namespace DRBDBReader.DB.Records
 			this.name = temp;
 
 			// get fieldThree
-			// Seems important... likely points to an entry in a different table
+			// Seems important... likely points to an entry in a different table.
+			// Possibilities: 3-3, 21-5
 			this.fieldThree = (ushort)this.table.readField( this, FIELD_THREE );
 
 			// get screenpos
