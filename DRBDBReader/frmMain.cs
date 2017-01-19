@@ -75,7 +75,12 @@ namespace DRBDBReader
 		{
 			if( this.db == null )
 			{
+				this.writeToConsole( "Loading database, please wait..." );
 				this.db = new Database( this.fi );
+				// manually append text to avoid the automatic newline preceeding it
+				this.txtConsole.AppendText( " ...done!" + Environment.NewLine );
+				this.txtConsole.SelectionStart = this.txtConsole.Text.Length;
+				this.txtConsole.Refresh();
 			}
 		}
 
@@ -244,30 +249,6 @@ namespace DRBDBReader
 						}
 
 						this.writeToConsole( "Records: " + tt.records.Length + "; Hits: " + hits + Environment.NewLine );
-
-						break;
-					case "menuidfuzz":
-						this.checkDB();
-
-						string[] menufuzzSplit = splitted[1].Split( new char[] { ' ' }, 2 );
-
-						ushort menufuzzTableNum = Util.parseUShort( menufuzzSplit[0] );
-						byte menufuzzColNum = (byte)Util.parseUShort( menufuzzSplit[1] );
-						Table menufuzzTable = this.db.tables[menufuzzTableNum];
-						Table menuTable = this.db.tables[Database.TABLE_DRB_MENU];
-						int menufuzzHits = 0;
-
-						foreach( Record fuzzrec in menufuzzTable.records )
-						{
-							ushort fuzzfield = (ushort)menufuzzTable.readField( fuzzrec, menufuzzColNum );
-							Record menuRec = menuTable.getRecord( fuzzfield, sorted: false );
-							if( menuRec != null )
-							{
-								menufuzzHits++;
-							}
-						}
-
-						this.writeToConsole( "Records: " + menufuzzTable.records.Length + "; Hits: " + menufuzzHits + Environment.NewLine );
 
 						break;
 					case "modid":
