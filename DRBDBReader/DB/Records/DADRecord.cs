@@ -17,25 +17,35 @@
  */
 namespace DRBDBReader.DB.Records
 {
-	public class RecordUnknownWithString : Record
+	public class DADRecord : Record
 	{
 		private const byte FIELD_ID = 0;
-		public byte stringidcol;
+		private const byte FIELD_REQUEST_LENGTH = 1;
+		private const byte FIELD_RESPONSE_LENGTH = 3;
+		private const byte FIELD_EXTRACT_OFFSET = 5;
+		private const byte FIELD_EXTRACT_SIZE = 6;
+		private const byte FIELD_PROTOCOL = 10;
 
 		public ushort id;
 
-		public string str;
-		public ushort strid;
+		public byte requestLength;
+		public byte responseLength;
+		public byte extractOffset;
+		public byte extractSize;
 
-		public RecordUnknownWithString( Table table, byte[] record, byte stringidcol ) : base( table, record )
+		public ushort protocolid;
+
+		public DADRecord( Table table, byte[] record ) : base( table, record )
 		{
-			this.stringidcol = stringidcol;
-			// get id
 			this.id = (ushort)this.table.readField( this, FIELD_ID );
 
-			// get string
-			this.strid = (ushort)this.table.readField( this, this.stringidcol );
-			this.str = this.table.db.getString( this.strid );
+			this.requestLength = (byte)this.table.readField( this, FIELD_REQUEST_LENGTH );
+			this.responseLength = (byte)this.table.readField( this, FIELD_RESPONSE_LENGTH );
+
+			this.extractOffset = (byte)this.table.readField( this, FIELD_EXTRACT_OFFSET );
+			this.extractSize = (byte)this.table.readField( this, FIELD_EXTRACT_SIZE );
+
+			this.protocolid = (ushort)this.table.readField( this, FIELD_PROTOCOL );
 		}
 	}
 }

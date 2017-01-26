@@ -45,21 +45,16 @@ namespace DRBDBReader.DB.Records
 
 			// get name
 			this.nameid = (ushort)this.table.readField( this, FIELD_NAMEID );
-			string temp = this.table.db.getString( this.nameid );
-			if( temp == null )
-			{
-				temp = "(null)";
-			}
-			this.name = temp;
+			this.name = this.table.db.getString( this.nameid );
 
 
 			// get dataelements
 			Table t = this.table.db.tables[Database.TABLE_MODULE_DATAELEMENT];
-			List<ushort> recordIds = t.selectRecordsReturnIDs( 0, this.id, true );
-			this.dataelements = new TXRecord[recordIds.Count];
+			List<Record> dataElemRecords = t.selectRecords( 0, this.id, true );
+			this.dataelements = new TXRecord[dataElemRecords.Count];
 			for( int i = 0; i < dataelements.Length; ++i )
 			{
-				this.dataelements[i] = (TXRecord)( this.table.db.tables[Database.TABLE_TRANSMIT].getRecord( t.readField( t.records[recordIds[i]], 1 ) ) );
+				this.dataelements[i] = (TXRecord)( this.table.db.tables[Database.TABLE_TRANSMIT].getRecord( ((ModuleDataElemRecord)dataElemRecords[i]).txid ) );
 			}
 		}
 	}

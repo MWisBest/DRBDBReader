@@ -51,6 +51,15 @@
     <Compile Include="DB\Converters\BinaryStateConverter.cs" />
     <Compile Include="DB\Converters\Converter.cs" />
     <Compile Include="DB\Database.cs" />
+    <Compile Include="DB\Records\BDSRecord.cs" />
+    <Compile Include="DB\Records\ModuleDataElemRecord.cs" />
+    <Compile Include="DB\Records\NCRecord.cs" />
+    <Compile Include="DB\Records\NDSRecord.cs" />
+    <Compile Include="DB\Records\SCRecord.cs" />
+    <Compile Include="DB\Records\SDSRecord.cs" />
+    <Compile Include="DB\Records\StateEntryRecord.cs" />
+    <Compile Include="DB\SimpleBinaryReader.cs" />
+    <Compile Include="DB\Records\DADRecord.cs" />
     <Compile Include="DB\Records\DESRecord.cs" />
     <Compile Include="DB\Records\MenuRecord.cs" />
     <Compile Include="DB\Records\ModuleRecord.cs" />

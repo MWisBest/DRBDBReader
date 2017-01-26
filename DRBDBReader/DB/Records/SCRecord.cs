@@ -15,27 +15,27 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+using DRBDBReader.DB.Converters;
+
 namespace DRBDBReader.DB.Records
 {
-	public class RecordUnknownWithString : Record
+	public class SCRecord : Record
 	{
 		private const byte FIELD_ID = 0;
-		public byte stringidcol;
+		private const byte FIELD_MASK = 1;
+		private const byte FIELD_OP = 2;
 
 		public ushort id;
 
-		public string str;
-		public ushort strid;
+		public ushort mask;
+		public Operator op;
 
-		public RecordUnknownWithString( Table table, byte[] record, byte stringidcol ) : base( table, record )
+		public SCRecord( Table table, byte[] record ) : base( table, record )
 		{
-			this.stringidcol = stringidcol;
-			// get id
 			this.id = (ushort)this.table.readField( this, FIELD_ID );
 
-			// get string
-			this.strid = (ushort)this.table.readField( this, this.stringidcol );
-			this.str = this.table.db.getString( this.strid );
+			this.mask = (ushort)this.table.readField( this, FIELD_MASK );
+			this.op = (Operator)( (byte)( ( (ushort)this.table.readField( this, FIELD_OP ) ) >> 8 ) );
 		}
 	}
 }

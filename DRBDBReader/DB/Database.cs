@@ -20,6 +20,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using DRBDBReader.DB.Records;
 
 namespace DRBDBReader.DB
@@ -32,7 +33,7 @@ namespace DRBDBReader.DB
 		public const ushort TABLE_UNKNOWN_3 = 3;
 		public const ushort TABLE_CONVERTERS_STATE = 4;
 		public const ushort TABLE_CONVERTERS_NUMERIC = 5;
-		public const ushort TABLE_SERIVCE_CAT_STUFFS = 6; // lolidk
+		public const ushort TABLE_SERIVCE_CAT_STUFFS = 6;
 		public const ushort TABLE_QUALIFIER = 7;
 		public const ushort TABLE_DATA_ACQUISITION_DESCRIPTION = 8;
 		public const ushort TABLE_DRB_MENU = 9;
@@ -56,11 +57,10 @@ namespace DRBDBReader.DB
 		public const ushort TABLE_DBTEXT_2 = 27;
 
 		private FileInfo dbFile;
-		private MemoryStream dbStream;
-		public BinaryReader reader;
+		public SimpleBinaryReader dbReader;
 		public Table[] tables;
 
-		private ushort[] recordReadOrder = {
+		private static ushort[] syncedTableReadOrder = {
 			TABLE_DBTEXT_1,
 			TABLE_DBTEXT_2,
 			TABLE_STATE,
@@ -76,14 +76,14 @@ namespace DRBDBReader.DB
 			TABLE_UNKNOWN_21, // Field 3: string id
 			TABLE_UNKNOWN_22,
 
-			TABLE_BINARY_DATA_SPECIFIER,
-			TABLE_NUMERIC_DATA_SPECIFIER,
-			TABLE_STATE_DATA_SPECIFIER,
+			TABLE_STATE_DATA_SPECIFIER, // must come before TABLE_TRANSMIT, probably before TABLE_BINARY_DATA_SPECIFIER
+			TABLE_BINARY_DATA_SPECIFIER, // must come before TABLE_TRANSMIT
+			TABLE_NUMERIC_DATA_SPECIFIER, // must come before TABLE_TRANSMIT
 
-			TABLE_CONVERTERS_STATE,
-			TABLE_CONVERTERS_NUMERIC,
+			TABLE_CONVERTERS_STATE, // must come before TABLE_TRANSMIT
+			TABLE_CONVERTERS_NUMERIC, // must come before TABLE_TRANSMIT
+			TABLE_STATE_ENTRY, // must come before TABLE_TRANSMIT
 			TABLE_DATA_ACQUISITION_DESCRIPTION,
-			TABLE_STATE_ENTRY,
 			TABLE_QUALIFIER,
 			TABLE_DATAELEMENT_QUALIFIER,
 			TABLE_DRB_MENU,
@@ -92,7 +92,42 @@ namespace DRBDBReader.DB
 			TABLE_SERIVCE_CAT_STUFFS, // must come before TABLE_TRANSMIT
 			TABLE_TRANSMIT, // must come before TABLE_MODULE_DATAELEMENT
 			TABLE_MODULE_DATAELEMENT, // must come before TABLE_MODULE
-			TABLE_MODULE };
+			TABLE_MODULE
+		};
+
+		private static ushort[] mainTableReadOrder = {
+			TABLE_UNKNOWN_3,  // Field 2: string id
+			TABLE_UNKNOWN_21, // Field 3: string id
+
+			TABLE_STATE_DATA_SPECIFIER,
+			TABLE_BINARY_DATA_SPECIFIER,
+			TABLE_NUMERIC_DATA_SPECIFIER,
+
+			TABLE_CONVERTERS_STATE,
+			TABLE_CONVERTERS_NUMERIC,
+			TABLE_STATE_ENTRY,
+			TABLE_DATA_ACQUISITION_DESCRIPTION,
+			TABLE_QUALIFIER,
+			TABLE_DATAELEMENT_QUALIFIER,
+			TABLE_DRB_MENU,
+
+			TABLE_DES_INFO, // must come before TABLE_TRANSMIT, maybe others?
+			TABLE_SERIVCE_CAT_STUFFS, // must come before TABLE_TRANSMIT
+			TABLE_TRANSMIT, // must come before TABLE_MODULE_DATAELEMENT
+			TABLE_MODULE_DATAELEMENT, // must come before TABLE_MODULE
+			TABLE_MODULE
+		};
+
+		private static ushort[] noDependencyTables = {
+			TABLE_EMPTY_12,
+			TABLE_EMPTY_24,
+			TABLE_EMPTY_25,
+			TABLE_UNKNOWN_11,
+			TABLE_UNKNOWN_14,
+			TABLE_UNKNOWN_19,
+			TABLE_UNKNOWN_20, // Field 2: looks like string id but isn't
+			TABLE_UNKNOWN_22
+		};
 
 		public bool isStarScanDB;
 		
@@ -103,14 +138,10 @@ namespace DRBDBReader.DB
 			/* Since we're going to need access to this data often, lets load it into a MemoryStream.
 			 * With it being about 2.5MB it's fairly cheap.
 			 */
-			byte[] buffer;
 			using( FileStream fs = new FileStream( this.dbFile.FullName, FileMode.Open, FileAccess.Read ) )
 			{
-				buffer = new byte[fs.Length];
-				fs.Read( buffer, 0, buffer.Length );
+				this.dbReader = new SimpleBinaryReader( fs );
 			}
-			this.dbStream = new MemoryStream( buffer );
-			this.reader = new BinaryReader( this.dbStream );
 
 			/* StarSCAN's database.mem has a different endianness;
 			 * This detects and accounts for that as needed.
@@ -122,41 +153,35 @@ namespace DRBDBReader.DB
 
 		private bool checkStarScan()
 		{
-			bool ret;
-
-			long tempPos = this.reader.BaseStream.Position;
-			this.reader.BaseStream.Seek( this.reader.BaseStream.Length - 0x17, SeekOrigin.Begin );
-
 			/* Rather than try and deal with converting this to a string etc.,
 			 * it's cheaper to just work with and compare bytes directly. */
-			byte[] starscanbytes = this.reader.ReadBytes( 8 );
-			ret = starscanbytes.SequenceEqual( new byte[] { 0x53, 0x74, 0x61, 0x72, 0x53, 0x43, 0x41, 0x4E } );
-
-			this.reader.BaseStream.Seek( tempPos, SeekOrigin.Begin );
-			return ret;
+			int offset = this.dbReader.rawDB.Length - 0x17;
+			byte[] starscanbytes = this.dbReader.ReadBytes( ref offset, 8 );
+			return starscanbytes.SequenceEqual( new byte[] { 0x53, 0x74, 0x61, 0x72, 0x53, 0x43, 0x41, 0x4E } );
 		}
 
 		private void makeTables()
 		{
-			uint fileSize = this.reader.ReadUInt32();
-			ushort idk = this.reader.ReadUInt16();
-			ushort numTables = this.reader.ReadUInt16();
+			int readOffset = 0;
+			uint fileSize = this.dbReader.ReadUInt32( ref readOffset );
+			ushort idk = this.dbReader.ReadUInt16( ref readOffset );
+			ushort numTables = this.dbReader.ReadUInt16( ref readOffset );
 			this.tables = new Table[numTables];
 			for( ushort i = 0; i < numTables; ++i )
 			{
-				uint offset = this.reader.ReadUInt32();
-				ushort rowCount = this.reader.ReadUInt16();
-				ushort rowSize = this.reader.ReadUInt16();
+				uint tableOffset = this.dbReader.ReadUInt32( ref readOffset );
+				ushort rowCount = this.dbReader.ReadUInt16( ref readOffset );
+				ushort rowSize = this.dbReader.ReadUInt16( ref readOffset );
 
 				/* While technically the 'stated' code alone was correct, it had an issue:
 				 * there are some columns with a size of 0! This is a waste.
 				 * As such, empty columns are now removed and field IDs adjusted for that. */
-				byte statedColCount = this.reader.ReadByte();
-				byte[] statedColSizes = this.reader.ReadBytes( statedColCount );
+				byte statedColCount = this.dbReader.ReadUInt8( ref readOffset );
+				byte[] statedColSizes = this.dbReader.ReadBytes( ref readOffset, statedColCount );
 
 				/* There's actually room reserved for 27 bytes after the statedColCount,
-				 * so it is necessary to seek past whatever bytes that go unread. */
-				this.reader.BaseStream.Seek( 27 - statedColCount, SeekOrigin.Current );
+				 * so it is necessary to read past whatever bytes that go unread. */
+				readOffset += 27 - statedColCount;
 
 				List<byte> colSizes = new List<byte>();
 				for( byte j = 0; j < statedColCount; ++j )
@@ -167,16 +192,45 @@ namespace DRBDBReader.DB
 					}
 				}
 
-				this.tables[i] = new Table( this, i, offset, rowCount, rowSize, (byte)colSizes.Count, colSizes.ToArray<byte>() );
+				this.tables[i] = new Table( this, i, tableOffset, rowCount, rowSize, (byte)colSizes.Count, colSizes.ToArray<byte>() );
 			}
 
-			foreach( ushort x in recordReadOrder )
+
+			//// single-threaded read version
+			//this.readTables( syncedTableReadOrder );
+
+			//// multi-threaded read version
+			// The no-dependency tables can be read off right away
+			Thread noDependencyTablesThread = new Thread( this.readTables );
+			noDependencyTablesThread.Start( noDependencyTables );
+
+			// Text tables should be read first.
+			Thread dbTextOneThread = new Thread( this.readTables );
+			Thread dbTextTwoThread = new Thread( this.readTables );
+			Thread stateTableThread = new Thread( this.readTables );
+			dbTextOneThread.Start( new ushort[] { TABLE_DBTEXT_1 } );
+			dbTextTwoThread.Start( new ushort[] { TABLE_DBTEXT_2 } );
+			stateTableThread.Start( new ushort[] { TABLE_STATE } );
+			stateTableThread.Join();
+			dbTextTwoThread.Join();
+			dbTextOneThread.Join();
+
+			Thread mainTableThread = new Thread( this.readTables );
+			mainTableThread.Start( mainTableReadOrder );
+			mainTableThread.Join();
+			noDependencyTablesThread.Join();
+		}
+
+		private void readTables( object tableReadOrder )
+		{
+			foreach( ushort x in (ushort[])tableReadOrder )
 			{
 				this.tables[x].readRecords();
 			}
 		}
 
 		private StringBuilder cachedStateBuilder = new StringBuilder();
+		private object stateBuilderLock = new object();
 		private Dictionary<ushort, string> cachedStrings = new Dictionary<ushort, string>();
 
 		public string getString( ushort id )
@@ -194,8 +248,6 @@ namespace DRBDBReader.DB
 				return "(null)";
 			}
 
-			cachedStateBuilder.Clear();
-
 			int p = (int)t.readField( recordObj, 1 );
 			Table txtTable = this.tables[(ushort)(TABLE_DBTEXT_1 + ( p >> 24 ))];
 
@@ -205,18 +257,23 @@ namespace DRBDBReader.DB
 			Record txtRecord = txtTable.records[row];
 			byte curByte;
 
-			while( ( curByte = txtRecord.record[rowOffset] ) != 0 )
+			lock( stateBuilderLock )
 			{
-				cachedStateBuilder.Append( Convert.ToChar( curByte ) );
-				++rowOffset;
-				if( rowOffset >= txtTable.rowSize )
-				{
-					rowOffset = 0;
-					txtRecord = txtTable.records[++row];
-				}
-			}
+				cachedStateBuilder.Clear();
 
-			this.cachedStrings[id] = cachedStateBuilder.ToString();
+				while( ( curByte = txtRecord.record[rowOffset] ) != 0 )
+				{
+					cachedStateBuilder.Append( Convert.ToChar( curByte ) );
+					++rowOffset;
+					if( rowOffset >= txtTable.rowSize )
+					{
+						rowOffset = 0;
+						txtRecord = txtTable.records[++row];
+					}
+				}
+
+				this.cachedStrings[id] = cachedStateBuilder.ToString();
+			}
 
 			return this.cachedStrings[id];
 		}
@@ -280,7 +337,7 @@ namespace DRBDBReader.DB
 			}
 			TXRecord txrec = (TXRecord)recordObj;
 
-			string protocolTxt = this.getProtocolText( txrec.protocolid ) + "; ";
+			string protocolTxt = this.getProtocolText( txrec.dadRecord.protocolid ) + "; ";
 
 			return txrec.name + ": " + protocolTxt + "xmit: " + txrec.xmitstring + "; sc: " + txrec.scname;
 		}
@@ -295,11 +352,11 @@ namespace DRBDBReader.DB
 			}
 			TXRecord txrec = (TXRecord)recordObj;
 
-			string protocolTxt = this.getProtocolText( txrec.protocolid ) + "; ";
+			string protocolTxt = this.getProtocolText( txrec.dadRecord.protocolid ) + "; ";
 
 			string detailText = "";
-			detailText += Environment.NewLine + "dadreqlen: " + txrec.dadreqlen + "; dadresplen: " + txrec.dadresplen + ";";
-			detailText += Environment.NewLine + "dadextroff: " + txrec.dadextroff + "; dadextrsize: " + txrec.dadextrsize + ";";
+			detailText += Environment.NewLine + "dadreqlen: " + txrec.dadRecord.requestLength + "; dadresplen: " + txrec.dadRecord.responseLength + ";";
+			detailText += Environment.NewLine + "dadextroff: " + txrec.dadRecord.extractOffset + "; dadextrsize: " + txrec.dadRecord.extractSize + ";";
 			detailText += Environment.NewLine + "desid: " + txrec.dataelemsetid + "; desname: " + this.getDESString( txrec.dataelemsetid ) + ";";
 			detailText += Environment.NewLine + "record: " + BitConverter.ToString( txrec.record ) + ";";
 

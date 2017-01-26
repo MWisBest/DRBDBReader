@@ -50,12 +50,7 @@ namespace DRBDBReader.DB.Records
 
 			// get name
 			this.nameid = (ushort)this.table.readField( this, FIELD_NAME_ID );
-			string temp = this.table.db.getString( this.nameid );
-			if( temp == null )
-			{
-				temp = "(null)";
-			}
-			this.name = temp;
+			this.name = this.table.db.getString( this.nameid );
 
 			// get fieldThree
 			// Seems important... likely points to an entry in a different table.

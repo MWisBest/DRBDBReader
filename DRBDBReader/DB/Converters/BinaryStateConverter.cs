@@ -21,9 +21,6 @@ namespace DRBDBReader.DB.Converters
 {
 	public class BinaryStateConverter : StateConverter
 	{
-		private const byte FIELD_BDS_TRUE_STR_ID  = 1;
-		private const byte FIELD_BDS_FALSE_STR_ID = 2;
-
 		public BinaryStateConverter( Database db, byte[] record, ushort cfid, ushort dsid ) : base( db, record, cfid, dsid )
 		{
 		}
@@ -31,32 +28,29 @@ namespace DRBDBReader.DB.Converters
 		protected override void buildStateList()
 		{
 			Table bdsTable = this.db.tables[Database.TABLE_BINARY_DATA_SPECIFIER];
-			Record bdsRecord = bdsTable.getRecord( this.dsid );
+			BDSRecord bdsRecord = (BDSRecord)bdsTable.getRecord( this.dsid );
 
-			string stateTrue = this.db.getString( (ushort)bdsTable.readField( bdsRecord, FIELD_BDS_TRUE_STR_ID ) );
-			string stateFalse = this.db.getString( (ushort)bdsTable.readField( bdsRecord, FIELD_BDS_FALSE_STR_ID ) );
-
-			this.entries.Add( 0, stateFalse );
-			this.entries.Add( 1, stateTrue );
+			this.entries.Add( 0, bdsRecord.falseString );
+			this.entries.Add( 1, bdsRecord.trueString );
 		}
 
 		protected override ushort getEntryID( ushort val )
 		{
-			switch( this.op )
+			switch( this.scRecord.op )
 			{
 				case Operator.GREATER:
-					return (ushort)( val > this.mask ? 1 : 0 );
+					return (ushort)( val > this.scRecord.mask ? 1 : 0 );
 				case Operator.LESS:
-					return (ushort)( val < this.mask ? 1 : 0 );
+					return (ushort)( val < this.scRecord.mask ? 1 : 0 );
 				case Operator.MASK_ZERO:
-					return (ushort)( ( val & this.mask ) == 0 ? 1 : 0 );
+					return (ushort)( ( val & this.scRecord.mask ) == 0 ? 1 : 0 );
 				case Operator.MASK_NOT_ZERO:
-					return (ushort)( ( val & this.mask ) != 0 ? 1 : 0 );
+					return (ushort)( ( val & this.scRecord.mask ) != 0 ? 1 : 0 );
 				case Operator.NOT_EQUAL:
-					return (ushort)( val != this.mask ? 1 : 0 );
+					return (ushort)( val != this.scRecord.mask ? 1 : 0 );
 				case Operator.EQUAL:
 				default:
-					return (ushort)( val == this.mask ? 1 : 0 );
+					return (ushort)( val == this.scRecord.mask ? 1 : 0 );
 			}
 		}
 	}

@@ -35,12 +35,7 @@ namespace DRBDBReader.DB.Records
 
 			// get name
 			this.nameid = (ushort)this.table.readField( this, FIELD_NAMEID );
-			string temp = this.table.db.getString( this.nameid );
-			if( temp == null )
-			{
-				temp = "(null)";
-			}
-			this.name = temp;
+			this.name = this.table.db.getString( this.nameid );
 		}
 	}
 }

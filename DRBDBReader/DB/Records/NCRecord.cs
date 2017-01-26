@@ -15,27 +15,27 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+using System;
+
 namespace DRBDBReader.DB.Records
 {
-	public class RecordUnknownWithString : Record
+	public class NCRecord : Record
 	{
 		private const byte FIELD_ID = 0;
-		public byte stringidcol;
+		private const byte FIELD_SLOPE = 1;
+		private const byte FIELD_OFFSET = 2;
 
 		public ushort id;
 
-		public string str;
-		public ushort strid;
+		public float slope;
+		public float offset;
 
-		public RecordUnknownWithString( Table table, byte[] record, byte stringidcol ) : base( table, record )
+		public NCRecord( Table table, byte[] record ) : base( table, record )
 		{
-			this.stringidcol = stringidcol;
-			// get id
 			this.id = (ushort)this.table.readField( this, FIELD_ID );
 
-			// get string
-			this.strid = (ushort)this.table.readField( this, this.stringidcol );
-			this.str = this.table.db.getString( this.strid );
+			this.slope = BitConverter.ToSingle( BitConverter.GetBytes( (int)this.table.readField( this, FIELD_SLOPE ) ), 0 );
+			this.offset = BitConverter.ToSingle( BitConverter.GetBytes( (int)this.table.readField( this, FIELD_OFFSET ) ), 0 );
 		}
 	}
 }

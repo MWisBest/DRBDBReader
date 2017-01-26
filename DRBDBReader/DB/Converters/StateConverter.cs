@@ -22,27 +22,16 @@ namespace DRBDBReader.DB.Converters
 {
 	public class StateConverter : Converter
 	{
-		private const byte FIELD_SC_MASK = 1;
-		private const byte FIELD_SC_OP = 2;
+		public SCRecord scRecord;
 
-		private const byte FIELD_SDS_DEFSTR_ID = 1;
-
-		private const byte FIELD_SE_STR_ID = 0;
-		private const byte FIELD_SE_VALUE = 1;
-
-		public Operator op;
-		public ushort mask;
-
-		public string defaultState;
+		public SDSRecord sdsRecord;
 		public Dictionary<ushort, string> entries;
 
 		public StateConverter( Database db, byte[] record, ushort cfid, ushort dsid ) : base( db, record, cfid, dsid )
 		{
 			Table stateConvTable = this.db.tables[Database.TABLE_CONVERTERS_STATE];
-			Record stateConvRecord = stateConvTable.getRecord( this.cfid );
+			this.scRecord = (SCRecord)stateConvTable.getRecord( this.cfid );
 
-			this.mask = (ushort)stateConvTable.readField( stateConvRecord, FIELD_SC_MASK );
-			this.op = (Operator)( (byte)( ( (ushort)stateConvTable.readField( stateConvRecord, FIELD_SC_OP ) ) >> 8 ) );
 			this.entries = new Dictionary<ushort, string>();
 			this.buildStateList();
 		}
@@ -50,18 +39,15 @@ namespace DRBDBReader.DB.Converters
 		protected virtual void buildStateList()
 		{
 			Table sdsTable = this.db.tables[Database.TABLE_STATE_DATA_SPECIFIER];
-			Record sdsRecord = sdsTable.getRecord( this.dsid );
-			int defaultid = (int)sdsTable.readField( sdsRecord, FIELD_SDS_DEFSTR_ID );
-			this.defaultState = ( defaultid != 0 ? this.db.getString( (ushort)defaultid ) : "N/A" );
+			this.sdsRecord = (SDSRecord)sdsTable.getRecord( this.dsid );
 
 			Table stateTable = this.db.tables[Database.TABLE_STATE_ENTRY];
-			List<ushort> recordIds = stateTable.selectRecordsReturnIDs( 3, this.dsid );
-			for( ushort i = 0; i < recordIds.Count; ++i )
+			foreach( StateEntryRecord seRecord in stateTable.records )
 			{
-				ushort value = (ushort)stateTable.readField( stateTable.records[recordIds[i]], FIELD_SE_VALUE );
-				string name = this.db.getString( (ushort)stateTable.readField( stateTable.records[recordIds[i]], FIELD_SE_STR_ID ) );
-
-				this.entries.Add( value, name );
+				if( seRecord.dsidThing == this.dsid )
+				{
+					this.entries.Add( seRecord.value, seRecord.nameString );
+				}
 			}
 		}
 
@@ -72,14 +58,14 @@ namespace DRBDBReader.DB.Converters
 			{
 				return this.entries[entryID];
 			}
-			return this.defaultState;
+			return this.sdsRecord.defaultString;
 		}
 
 		protected virtual ushort getEntryID( ushort val )
 		{
-			if( this.mask != 0 )
+			if( this.scRecord.mask != 0 )
 			{
-				val = (ushort)( val & this.mask );
+				val = (ushort)( val & this.scRecord.mask );
 			}
 			return val;
 		}

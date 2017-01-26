@@ -17,7 +17,6 @@
  */
 using System;
 using System.Collections.Generic;
-using System.IO;
 using DRBDBReader.DB.Records;
 
 namespace DRBDBReader.DB
@@ -54,64 +53,108 @@ namespace DRBDBReader.DB
 
 		public void readRecords()
 		{
-			long tempPos = this.db.reader.BaseStream.Position;
-
-			this.db.reader.BaseStream.Seek( this.offset, SeekOrigin.Begin );
+			int readOffset = (int)this.offset;
 
 			// NOTE: loop unrolled purposely
 			switch( this.id )
 			{
+				case Database.TABLE_STATE_DATA_SPECIFIER:
+					for( ushort i = 0; i < this.rowCount; ++i )
+					{
+						records[i] = new SDSRecord( this, this.db.dbReader.ReadBytes( ref readOffset, this.rowSize ) );
+					}
+					break;
+				case Database.TABLE_BINARY_DATA_SPECIFIER:
+					for( ushort i = 0; i < this.rowCount; ++i )
+					{
+						records[i] = new BDSRecord( this, this.db.dbReader.ReadBytes( ref readOffset, this.rowSize ) );
+					}
+					break;
+				case Database.TABLE_NUMERIC_DATA_SPECIFIER:
+					for( ushort i = 0; i < this.rowCount; ++i )
+					{
+						records[i] = new NDSRecord( this, this.db.dbReader.ReadBytes( ref readOffset, this.rowSize ) );
+					}
+					break;
+				case Database.TABLE_CONVERTERS_STATE:
+					for( ushort i = 0; i < this.rowCount; ++i )
+					{
+						records[i] = new SCRecord( this, this.db.dbReader.ReadBytes( ref readOffset, this.rowSize ) );
+					}
+					break;
+				case Database.TABLE_CONVERTERS_NUMERIC:
+					for( ushort i = 0; i < this.rowCount; ++i )
+					{
+						records[i] = new NCRecord( this, this.db.dbReader.ReadBytes( ref readOffset, this.rowSize ) );
+					}
+					break;
+				case Database.TABLE_STATE_ENTRY:
+					for( ushort i = 0; i < this.rowCount; ++i )
+					{
+						records[i] = new StateEntryRecord( this, this.db.dbReader.ReadBytes( ref readOffset, this.rowSize ) );
+					}
+					break;
+				case Database.TABLE_DATA_ACQUISITION_DESCRIPTION:
+					for( ushort i = 0; i < this.rowCount; ++i )
+					{
+						records[i] = new DADRecord( this, this.db.dbReader.ReadBytes( ref readOffset, this.rowSize ) );
+					}
+					break;
 				case Database.TABLE_DES_INFO:
 					for( ushort i = 0; i < this.rowCount; ++i )
 					{
-						records[i] = new DESRecord( this, this.db.reader.ReadBytes( this.rowSize ) );
+						records[i] = new DESRecord( this, this.db.dbReader.ReadBytes( ref readOffset, this.rowSize ) );
 					}
 					break;
 				case Database.TABLE_SERIVCE_CAT_STUFFS:
 					for( ushort i = 0; i < this.rowCount; ++i )
 					{
-						records[i] = new ServiceCatRecord( this, this.db.reader.ReadBytes( this.rowSize ) );
+						records[i] = new ServiceCatRecord( this, this.db.dbReader.ReadBytes( ref readOffset, this.rowSize ) );
 					}
 					break;
 				case Database.TABLE_TRANSMIT:
 					for( ushort i = 0; i < this.rowCount; ++i )
 					{
-						records[i] = new TXRecord( this, this.db.reader.ReadBytes( this.rowSize ) );
+						records[i] = new TXRecord( this, this.db.dbReader.ReadBytes( ref readOffset, this.rowSize ) );
+					}
+					break;
+				case Database.TABLE_MODULE_DATAELEMENT:
+					for( ushort i = 0; i < this.rowCount; ++i )
+					{
+						records[i] = new ModuleDataElemRecord( this, this.db.dbReader.ReadBytes( ref readOffset, this.rowSize ) );
 					}
 					break;
 				case Database.TABLE_MODULE:
 					for( ushort i = 0; i < this.rowCount; ++i )
 					{
-						records[i] = new ModuleRecord( this, this.db.reader.ReadBytes( this.rowSize ) );
+						records[i] = new ModuleRecord( this, this.db.dbReader.ReadBytes( ref readOffset, this.rowSize ) );
 					}
 					break;
 				case Database.TABLE_DRB_MENU:
 					for( ushort i = 0; i < this.rowCount; ++i )
 					{
-						records[i] = new MenuRecord( this, this.db.reader.ReadBytes( this.rowSize ) );
+						records[i] = new MenuRecord( this, this.db.dbReader.ReadBytes( ref readOffset, this.rowSize ) );
 					}
 					break;
 				case Database.TABLE_UNKNOWN_3:
 					for( ushort i = 0; i < this.rowCount; ++i )
 					{
-						records[i] = new RecordUnknownWithString( this, this.db.reader.ReadBytes( this.rowSize ), 2 );
+						records[i] = new RecordUnknownWithString( this, this.db.dbReader.ReadBytes( ref readOffset, this.rowSize ), 2 );
 					}
 					break;
 				case Database.TABLE_UNKNOWN_21:
 					for( ushort i = 0; i < this.rowCount; ++i )
 					{
-						records[i] = new RecordUnknownWithString( this, this.db.reader.ReadBytes( this.rowSize ), 3 );
+						records[i] = new RecordUnknownWithString( this, this.db.dbReader.ReadBytes( ref readOffset, this.rowSize ), 3 );
 					}
 					break;
 				default:
 					for( ushort i = 0; i < this.rowCount; ++i )
 					{
-						records[i] = new Record( this, this.db.reader.ReadBytes( this.rowSize ) );
+						records[i] = new Record( this, this.db.dbReader.ReadBytes( ref readOffset, this.rowSize ) );
 					}
 					break;
 			}
-
-			this.db.reader.BaseStream.Seek( tempPos, SeekOrigin.Begin );
 		}
 
 		public Record getRecord( long key, byte idcol = 0, bool sorted = true )

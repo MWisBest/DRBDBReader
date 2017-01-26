@@ -22,35 +22,22 @@ namespace DRBDBReader.DB.Converters
 {
 	public class NumericConverter : Converter
 	{
-		private const byte FIELD_SLOPE = 1;
-		private const byte FIELD_OFFSET = 2;
-		private const byte FIELD_NDS_UNIT = 6;
-
-		public float slope;
-
-		public float offset;
-
-		public ushort unitid;
-		public string unit;
+		public NCRecord ncRecord;
+		public NDSRecord ndsRecord;
 
 		public NumericConverter( Database db, byte[] record, ushort cfid, ushort dsid ) : base( db, record, cfid, dsid )
 		{
 			Table numConvTable = this.db.tables[Database.TABLE_CONVERTERS_NUMERIC];
-			Record numConvRecord = numConvTable.getRecord( this.cfid );
-
-			this.slope = BitConverter.ToSingle( BitConverter.GetBytes( (int)numConvTable.readField( numConvRecord, FIELD_SLOPE ) ), 0 );
-			this.offset = BitConverter.ToSingle( BitConverter.GetBytes( (int)numConvTable.readField( numConvRecord, FIELD_OFFSET ) ), 0 );
+			this.ncRecord = (NCRecord)numConvTable.getRecord( this.cfid );
 
 			Table ndsTable = this.db.tables[Database.TABLE_NUMERIC_DATA_SPECIFIER];
-			Record ndsRecord = ndsTable.getRecord( this.dsid );
-			this.unitid = (ushort)ndsTable.readField( ndsRecord, FIELD_NDS_UNIT );
-			this.unit = ( this.unitid != 0 ? this.db.getString( this.unitid ) : "" );
+			this.ndsRecord = (NDSRecord)ndsTable.getRecord( this.dsid );
 		}
 
 		public override string processData( long data )
 		{
-			double result = data * this.slope + this.offset;
-			return result + " " + this.unit;
+			double result = data * this.ncRecord.slope + this.ncRecord.offset;
+			return result + " " + this.ndsRecord.unitString;
 		}
 	}
 }

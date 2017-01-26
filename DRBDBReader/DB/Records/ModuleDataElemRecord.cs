@@ -17,25 +17,20 @@
  */
 namespace DRBDBReader.DB.Records
 {
-	public class RecordUnknownWithString : Record
+	public class ModuleDataElemRecord : Record
 	{
-		private const byte FIELD_ID = 0;
-		public byte stringidcol;
+		private const byte FIELD_MODULE_FOR_ID = 0;
+		private const byte FIELD_TXID = 1;
 
-		public ushort id;
+		public ushort moduleForId;
 
-		public string str;
-		public ushort strid;
+		public long txid;
 
-		public RecordUnknownWithString( Table table, byte[] record, byte stringidcol ) : base( table, record )
+		public ModuleDataElemRecord( Table table, byte[] record ) : base( table, record )
 		{
-			this.stringidcol = stringidcol;
-			// get id
-			this.id = (ushort)this.table.readField( this, FIELD_ID );
+			this.moduleForId = (ushort)this.table.readField( this, FIELD_MODULE_FOR_ID );
 
-			// get string
-			this.strid = (ushort)this.table.readField( this, this.stringidcol );
-			this.str = this.table.db.getString( this.strid );
+			this.txid = this.table.readField( this, FIELD_TXID );
 		}
 	}
 }

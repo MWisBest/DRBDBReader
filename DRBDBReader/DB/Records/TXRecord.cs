@@ -30,20 +30,10 @@ namespace DRBDBReader.DB.Records
 		private const byte FIELD_STRING_ID = 8;
 		private const byte FIELD_SVCCAT_ID = 14;
 
-		private const byte FIELD_DAD_REQUEST_LENGTH = 1;
-		private const byte FIELD_DAD_RESPONSE_LENGTH = 3;
-		private const byte FIELD_DAD_EXTRACT_OFFSET = 5;
-		private const byte FIELD_DAD_EXTRACT_SIZE = 6;
-		private const byte FIELD_DAD_PROTOCOL = 10;
-
 		public long id;
 
 		public ushort dadid;
-		public byte dadreqlen;
-		public byte dadresplen;
-		public byte dadextroff;
-		public byte dadextrsize;
-		public ushort protocolid;
+		public DADRecord dadRecord;
 
 		public ushort dataelemsetid;
 
@@ -94,12 +84,7 @@ namespace DRBDBReader.DB.Records
 			// get protocol info
 			this.dadid = (ushort)this.table.readField( this, FIELD_DATA_AQU_DESC_ID );
 			Table dadTable = this.table.db.tables[Database.TABLE_DATA_ACQUISITION_DESCRIPTION];
-			Record recordObjTwo = dadTable.getRecord( this.dadid );
-			this.protocolid = (ushort)dadTable.readField( recordObjTwo, FIELD_DAD_PROTOCOL );
-			this.dadreqlen = (byte)dadTable.readField( recordObjTwo, FIELD_DAD_REQUEST_LENGTH );
-			this.dadresplen = (byte)dadTable.readField( recordObjTwo, FIELD_DAD_RESPONSE_LENGTH );
-			this.dadextroff = (byte)dadTable.readField( recordObjTwo, FIELD_DAD_EXTRACT_OFFSET );
-			this.dadextrsize = (byte)dadTable.readField( recordObjTwo, FIELD_DAD_EXTRACT_SIZE );
+			this.dadRecord = (DADRecord)dadTable.getRecord( this.dadid );
 
 
 			// get data elem set stuff
@@ -116,12 +101,7 @@ namespace DRBDBReader.DB.Records
 
 			// get name
 			this.nameid = (ushort)this.table.readField( this, FIELD_STRING_ID );
-			string temp = this.table.db.getString( this.nameid );
-			if( temp == null )
-			{
-				temp = "(null)";
-			}
-			this.name = temp;
+			this.name = this.table.db.getString( this.nameid );
 
 
 			// get scid/scname
