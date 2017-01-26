@@ -37,7 +37,6 @@ namespace DRBDBReader.DB
 		// This saves us a ridiculous amount of memory.
 		// GC catches it otherwise of course, but without this
 		// we were making 1GB of allocations. Now it's not even 20MB.
-		private byte[] empty = new byte[8];
 		private byte[] scratch = new byte[8];
 
 		public Table( Database db, ushort id, uint offset, ushort rowCount, ushort rowSize, byte colCount, byte[] colSizes )
@@ -213,11 +212,13 @@ namespace DRBDBReader.DB
 			 * By making 'scratch' an instance variable of this method's
 			 * containing class, it can avoid all that garbage.
 			 *
-			 * Since 'scratch' needs to start out empty though, we also
-			 * need to memcpy a spare empty array to it to clear it out.
-			 * This is a million percent cheaper than allocating a new array.
+			 * Since 'scratch' needs to start out empty though, we also need to
+			 * clear it out. We can skip the bytes we know we're reading though
 			 */
-			this.empty.CopyTo( this.scratch, 0 );
+			for( int i = colSize; i < this.scratch.Length; ++i )
+			{
+				this.scratch[i] = 0;
+			}
 
 			if( !this.db.isStarScanDB )
 			{
