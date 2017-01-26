@@ -16,6 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 using System;
+using System.Collections.Generic;
 using DRBDBReader.DB.Converters;
 
 namespace DRBDBReader.DB.Records
@@ -63,23 +64,24 @@ namespace DRBDBReader.DB.Records
 			switch( convertfield[0] )
 			{
 				case 0:
-					this.converter = new BinaryStateConverter( this.table.db, convertfield, cfid, dsid );
+					this.converter = this.getBSC( convertfield, cfid, dsid );
 					break;
 				case 17:
-					this.converter = new NumericConverter( this.table.db, convertfield, cfid, dsid );
+					this.converter = this.getNC( convertfield, cfid, dsid );
 					break;
 				case 32:
-					this.converter = new StateConverter( this.table.db, convertfield, cfid, dsid );
+					this.converter = this.getSC( convertfield, cfid, dsid );
 					break;
 				case 2:
 				case 18:
 				case 34:
-					this.converter = new UnknownConverter( this.table.db, convertfield, cfid, dsid );
+					this.converter = this.getUC( convertfield, cfid, dsid );
 					break;
 				default:
 					this.converter = new Converter( this.table.db, convertfield, cfid, dsid );
 					break;
 			}
+
 
 			// get protocol info
 			this.dadid = (ushort)this.table.readField( this, FIELD_DATA_AQU_DESC_ID );
@@ -107,6 +109,74 @@ namespace DRBDBReader.DB.Records
 			// get scid/scname
 			this.scid = (ushort)((int)(this.table.readField( this, FIELD_SVCCAT_ID ) >> 8));
 			this.scname = this.table.db.getServiceCatString( this.scid );
+		}
+
+		private BinaryStateConverter getBSC( byte[] convertfield, ushort cfid, ushort dsid )
+		{
+			if( this.table.txBSCCache.ContainsKey( cfid ) )
+			{
+				if( this.table.txBSCCache[cfid].ContainsKey( dsid ) )
+				{
+					return this.table.txBSCCache[cfid][dsid];
+				}
+			}
+			else
+			{
+				this.table.txBSCCache[cfid] = new Dictionary<ushort, BinaryStateConverter>();
+			}
+			this.table.txBSCCache[cfid][dsid] = new BinaryStateConverter( this.table.db, convertfield, cfid, dsid );
+			return this.table.txBSCCache[cfid][dsid];
+		}
+
+		private StateConverter getSC( byte[] convertfield, ushort cfid, ushort dsid )
+		{
+			if( this.table.txSCCache.ContainsKey( cfid ) )
+			{
+				if( this.table.txSCCache[cfid].ContainsKey( dsid ) )
+				{
+					return this.table.txSCCache[cfid][dsid];
+				}
+			}
+			else
+			{
+				this.table.txSCCache[cfid] = new Dictionary<ushort, StateConverter>();
+			}
+			this.table.txSCCache[cfid][dsid] = new StateConverter( this.table.db, convertfield, cfid, dsid );
+			return this.table.txSCCache[cfid][dsid];
+		}
+
+		private NumericConverter getNC( byte[] convertfield, ushort cfid, ushort dsid )
+		{
+			if( this.table.txNCCache.ContainsKey( cfid ) )
+			{
+				if( this.table.txNCCache[cfid].ContainsKey( dsid ) )
+				{
+					return this.table.txNCCache[cfid][dsid];
+				}
+			}
+			else
+			{
+				this.table.txNCCache[cfid] = new Dictionary<ushort, NumericConverter>();
+			}
+			this.table.txNCCache[cfid][dsid] = new NumericConverter( this.table.db, convertfield, cfid, dsid );
+			return this.table.txNCCache[cfid][dsid];
+		}
+
+		private UnknownConverter getUC( byte[] convertfield, ushort cfid, ushort dsid )
+		{
+			if( this.table.txUCCache.ContainsKey( cfid ) )
+			{
+				if( this.table.txUCCache[cfid].ContainsKey( dsid ) )
+				{
+					return this.table.txUCCache[cfid][dsid];
+				}
+			}
+			else
+			{
+				this.table.txUCCache[cfid] = new Dictionary<ushort, UnknownConverter>();
+			}
+			this.table.txUCCache[cfid][dsid] = new UnknownConverter( this.table.db, convertfield, cfid, dsid );
+			return this.table.txUCCache[cfid][dsid];
 		}
 	}
 }

@@ -17,6 +17,7 @@
  */
 using System;
 using System.Collections.Generic;
+using DRBDBReader.DB.Converters;
 using DRBDBReader.DB.Records;
 
 namespace DRBDBReader.DB
@@ -32,6 +33,12 @@ namespace DRBDBReader.DB
 		public Record[] records;
 		public Database db;
 		private Dictionary<long, int> idToRecordCache;
+
+		// Caches Converter classes for TX table. Odd placement, but... it works.
+		public Dictionary<ushort, Dictionary<ushort, BinaryStateConverter>> txBSCCache;
+		public Dictionary<ushort, Dictionary<ushort, NumericConverter>> txNCCache;
+		public Dictionary<ushort, Dictionary<ushort, StateConverter>> txSCCache;
+		public Dictionary<ushort, Dictionary<ushort, UnknownConverter>> txUCCache;
 
 		// This saves us a ridiculous amount of memory.
 		// GC catches it otherwise of course, but without this
@@ -49,6 +56,14 @@ namespace DRBDBReader.DB
 			this.colSizes = colSizes;
 			this.records = new Record[rowCount];
 			this.idToRecordCache = new Dictionary<long, int>();
+
+			if( this.id == Database.TABLE_TRANSMIT )
+			{
+				this.txBSCCache = new Dictionary<ushort, Dictionary<ushort, BinaryStateConverter>>();
+				this.txNCCache = new Dictionary<ushort, Dictionary<ushort, NumericConverter>>();
+				this.txSCCache = new Dictionary<ushort, Dictionary<ushort, StateConverter>>();
+				this.txUCCache = new Dictionary<ushort, Dictionary<ushort, UnknownConverter>>();
+			}
 		}
 
 		public void readRecords()

@@ -83,7 +83,7 @@ namespace DRBDBReader.DB
 			TABLE_CONVERTERS_STATE, // must come before TABLE_TRANSMIT
 			TABLE_CONVERTERS_NUMERIC, // must come before TABLE_TRANSMIT
 			TABLE_STATE_ENTRY, // must come before TABLE_TRANSMIT
-			TABLE_DATA_ACQUISITION_DESCRIPTION,
+			TABLE_DATA_ACQUISITION_DESCRIPTION, // must come before TABLE_TRANSMIT
 			TABLE_QUALIFIER,
 			TABLE_DATAELEMENT_QUALIFIER,
 			TABLE_DRB_MENU,
@@ -95,24 +95,31 @@ namespace DRBDBReader.DB
 			TABLE_MODULE
 		};
 
-		private static ushort[] mainTableReadOrder = {
+		private static ushort[] primaryTableReadOrder = {
 			TABLE_UNKNOWN_3,  // Field 2: string id
 			TABLE_UNKNOWN_21, // Field 3: string id
 
-			TABLE_STATE_DATA_SPECIFIER,
-			TABLE_BINARY_DATA_SPECIFIER,
-			TABLE_NUMERIC_DATA_SPECIFIER,
+			TABLE_STATE_DATA_SPECIFIER, // must come before TABLE_TRANSMIT, probably before TABLE_BINARY_DATA_SPECIFIER
+			TABLE_BINARY_DATA_SPECIFIER, // must come before TABLE_TRANSMIT
+			TABLE_NUMERIC_DATA_SPECIFIER, // must come before TABLE_TRANSMIT
 
-			TABLE_CONVERTERS_STATE,
-			TABLE_CONVERTERS_NUMERIC,
-			TABLE_STATE_ENTRY,
-			TABLE_DATA_ACQUISITION_DESCRIPTION,
-			TABLE_QUALIFIER,
-			TABLE_DATAELEMENT_QUALIFIER,
+			TABLE_STATE_ENTRY, // must come before TABLE_TRANSMIT
 			TABLE_DRB_MENU,
 
 			TABLE_DES_INFO, // must come before TABLE_TRANSMIT, maybe others?
-			TABLE_SERIVCE_CAT_STUFFS, // must come before TABLE_TRANSMIT
+			TABLE_SERIVCE_CAT_STUFFS // must come before TABLE_TRANSMIT
+		};
+
+		// Secondary tables have no string dependencies, to avoid locking in Database.getString()
+		private static ushort[] secondaryTableReadOrder = {
+			TABLE_DATAELEMENT_QUALIFIER,
+			TABLE_QUALIFIER,
+			TABLE_CONVERTERS_STATE, // must come before TABLE_TRANSMIT
+			TABLE_CONVERTERS_NUMERIC, // must come before TABLE_TRANSMIT
+			TABLE_DATA_ACQUISITION_DESCRIPTION // must come before TABLE_TRANSMIT
+		};
+
+		private static ushort[] finalTableReadOrder = {
 			TABLE_TRANSMIT, // must come before TABLE_MODULE_DATAELEMENT
 			TABLE_MODULE_DATAELEMENT, // must come before TABLE_MODULE
 			TABLE_MODULE
@@ -208,16 +215,30 @@ namespace DRBDBReader.DB
 			Thread dbTextOneThread = new Thread( this.readTables );
 			Thread dbTextTwoThread = new Thread( this.readTables );
 			Thread stateTableThread = new Thread( this.readTables );
+
 			dbTextOneThread.Start( new ushort[] { TABLE_DBTEXT_1 } );
 			dbTextTwoThread.Start( new ushort[] { TABLE_DBTEXT_2 } );
 			stateTableThread.Start( new ushort[] { TABLE_STATE } );
+
 			stateTableThread.Join();
 			dbTextTwoThread.Join();
 			dbTextOneThread.Join();
 
-			Thread mainTableThread = new Thread( this.readTables );
-			mainTableThread.Start( mainTableReadOrder );
-			mainTableThread.Join();
+			// Now read off the two thread-able Table sets
+			Thread primaryTableThread = new Thread( this.readTables );
+			Thread secondaryTableThread = new Thread( this.readTables );
+
+			primaryTableThread.Start( primaryTableReadOrder );
+			secondaryTableThread.Start( secondaryTableReadOrder );
+
+			secondaryTableThread.Join();
+			primaryTableThread.Join();
+
+			// Finish off with the final, single-threaded Table set
+			Thread finalTableThread = new Thread( this.readTables );
+			finalTableThread.Start( finalTableReadOrder );
+			finalTableThread.Join();
+
 			noDependencyTablesThread.Join();
 		}
 
