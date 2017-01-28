@@ -31,7 +31,7 @@ namespace DRBDBReader.DB.Records
 		private const byte FIELD_STRING_ID = 8;
 		private const byte FIELD_SVCCAT_ID = 14;
 
-		public long id;
+		public uint id;
 
 		public ushort dadid;
 		public DADRecord dadRecord;
@@ -52,7 +52,7 @@ namespace DRBDBReader.DB.Records
 		public TXRecord( Table table, byte[] record ) : base( table, record )
 		{
 			// get id
-			this.id = this.table.readField( this, FIELD_ID );
+			this.id = (uint)this.table.readField( this, FIELD_ID );
 
 
 			// get converter info

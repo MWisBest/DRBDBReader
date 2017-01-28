@@ -112,7 +112,7 @@ namespace DRBDBReader.DB
 
 		// Secondary tables have no string dependencies, to avoid locking in Database.getString()
 		private static ushort[] secondaryTableReadOrder = {
-			TABLE_DATAELEMENT_QUALIFIER,
+			TABLE_DATAELEMENT_QUALIFIER, // Field 2: looks like string id but isn't
 			TABLE_QUALIFIER,
 			TABLE_CONVERTERS_STATE, // must come before TABLE_TRANSMIT
 			TABLE_CONVERTERS_NUMERIC, // must come before TABLE_TRANSMIT
@@ -348,7 +348,7 @@ namespace DRBDBReader.DB
 			}
 		}
 
-		public string getTX( long id )
+		public string getTX( uint id )
 		{	
 			Table t = this.tables[TABLE_TRANSMIT];
 			Record recordObj = t.getRecord( id );
@@ -363,7 +363,7 @@ namespace DRBDBReader.DB
 			return txrec.name + ": " + protocolTxt + "xmit: " + txrec.xmitstring + "; sc: " + txrec.scname;
 		}
 
-		public string getDetailedTX( long id )
+		public string getDetailedTX( uint id )
 		{
 			Table t = this.tables[TABLE_TRANSMIT];
 			Record recordObj = t.getRecord( id );

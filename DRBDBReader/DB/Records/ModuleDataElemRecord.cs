@@ -24,13 +24,13 @@ namespace DRBDBReader.DB.Records
 
 		public ushort moduleForId;
 
-		public long txid;
+		public uint txid;
 
 		public ModuleDataElemRecord( Table table, byte[] record ) : base( table, record )
 		{
 			this.moduleForId = (ushort)this.table.readField( this, FIELD_MODULE_FOR_ID );
 
-			this.txid = this.table.readField( this, FIELD_TXID );
+			this.txid = (uint)this.table.readField( this, FIELD_TXID );
 		}
 	}
 }

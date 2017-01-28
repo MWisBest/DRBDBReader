@@ -70,5 +70,30 @@ namespace DRBDBReader
 
 			return ret;
 		}
+
+		public static uint parseUInt( string input )
+		{
+			string lower = input.ToLower().Replace( "_", "" );
+			uint ret;
+
+			if( lower.StartsWith( "0x" ) )
+			{
+				ret = Convert.ToUInt32( lower.Substring( 2 ), 16 );
+			}
+			else if( lower.StartsWith( "0b" ) )
+			{
+				ret = Convert.ToUInt32( lower.Substring( 2 ), 2 );
+			}
+			else if( lower.StartsWith( "0o" ) )
+			{
+				ret = Convert.ToUInt32( lower.Substring( 2 ), 8 );
+			}
+			else
+			{
+				ret = Convert.ToUInt32( lower );
+			}
+
+			return ret;
+		}
 	}
 }

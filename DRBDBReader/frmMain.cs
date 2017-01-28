@@ -91,7 +91,7 @@ namespace DRBDBReader
 				string tofind = "";
 				string[] tofindall = null;
 				ushort modid, stid;
-				long txid;
+				uint txid;
 				cmd = cmd.Trim();
 				this.cmdHistory.Add( cmd );
 				cmdIdx = this.cmdHistory.Count - 1;
@@ -121,9 +121,9 @@ namespace DRBDBReader
 					case "txid":
 						this.checkDB();
 
-						txid = Util.parseLong( splitted[1] );
+						txid = Util.parseUInt( splitted[1] );
 
-						this.writeToConsole( this.db.getDetailedTX( txid ) + Environment.NewLine );
+						this.writeToConsole( this.db.getDetailedTX( (uint)txid ) + Environment.NewLine );
 
 						break;
 					case "txrunconverter":
@@ -132,7 +132,7 @@ namespace DRBDBReader
 						string[] txconvsplit = splitted[1].Split( new char[] { ' ' }, 2 );
 						long convdata = 0;
 
-						txid = Util.parseLong( txconvsplit[0] );
+						txid = Util.parseUInt( txconvsplit[0] );
 						convdata = Util.parseLong( txconvsplit[1] );
 
 						Table txconvtable = this.db.tables[Database.TABLE_TRANSMIT];
@@ -153,11 +153,11 @@ namespace DRBDBReader
 						}
 
 						this.writeBulkToConsoleStart();
-						for( long l = 0x80000000L; l < 0x80009000L; ++l )
+						for( uint u = 0x80000000; u < 0x80009000; ++u )
 						{
 							try
 							{
-								string temp = this.db.getTX( l );
+								string temp = this.db.getTX( u );
 								if( temp != null )
 								{
 									string templower = temp.ToLower();
@@ -171,11 +171,11 @@ namespace DRBDBReader
 												goto SKIPTX;
 											}
 										}
-										this.writeBulkToConsole( temp + "; 0x" + l.ToString( "x" ) );
+										this.writeBulkToConsole( temp + "; 0x" + u.ToString( "x" ) );
 									}
 									else if( templower.Contains( tofind ) && !templower.Contains( "ccd;" ) )
 									{
-										this.writeBulkToConsole( temp + "; 0x" + l.ToString( "x" ) );
+										this.writeBulkToConsole( temp + "; 0x" + u.ToString( "x" ) );
 									}
 								}
 							}
@@ -193,7 +193,7 @@ namespace DRBDBReader
 					case "dumpstateconverter":
 						this.checkDB();
 
-						txid = Util.parseLong( splitted[1] );
+						txid = Util.parseUInt( splitted[1] );
 
 						Table dtcdumptxconvtable = this.db.tables[Database.TABLE_TRANSMIT];
 						TXRecord dtcdumptxconvrec = (TXRecord)dtcdumptxconvtable.getRecord( txid );
