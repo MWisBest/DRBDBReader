@@ -30,7 +30,8 @@ namespace DRBDBReader.DB.Records
 		public string scname;
 		public ushort nameid;
 		public string name;
-		public TXRecord[] dataelements;
+
+		public List<TXRecord> dataelements;
 
 		public ModuleRecord( Table table, byte[] record ) : base( table, record )
 		{
@@ -48,14 +49,8 @@ namespace DRBDBReader.DB.Records
 			this.name = this.table.db.getString( this.nameid );
 
 
-			// get dataelements
-			Table t = this.table.db.tables[Database.TABLE_MODULE_DATAELEMENT];
-			List<Record> dataElemRecords = t.selectRecords( 0, this.id, true );
-			this.dataelements = new TXRecord[dataElemRecords.Count];
-			for( int i = 0; i < dataelements.Length; ++i )
-			{
-				this.dataelements[i] = (TXRecord)( this.table.db.tables[Database.TABLE_TRANSMIT].getRecord( ((ModuleDataElemRecord)dataElemRecords[i]).txid ) );
-			}
+			// dataelements will be filled in as ModuleDataElemRecord's load
+			this.dataelements = new List<TXRecord>();
 		}
 	}
 }

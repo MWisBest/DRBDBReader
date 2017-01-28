@@ -31,6 +31,13 @@ namespace DRBDBReader.DB.Records
 			this.moduleForId = (ushort)this.table.readField( this, FIELD_MODULE_FOR_ID );
 
 			this.txid = (uint)this.table.readField( this, FIELD_TXID );
+
+			// Add TXRecord to corresponding ModuleRecord's List<TXRecord>
+			Table moduleTable = this.table.db.tables[Database.TABLE_MODULE];
+			Table txTable = this.table.db.tables[Database.TABLE_TRANSMIT];
+			ModuleRecord moduleRec = (ModuleRecord)moduleTable.getRecord( this.moduleForId );
+			TXRecord txRec = (TXRecord)txTable.getRecord( this.txid );
+			moduleRec.dataelements.Add( txRec );
 		}
 	}
 }

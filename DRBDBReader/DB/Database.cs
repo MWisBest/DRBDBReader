@@ -91,8 +91,8 @@ namespace DRBDBReader.DB
 			TABLE_DES_INFO, // must come before TABLE_TRANSMIT, maybe others?
 			TABLE_SERIVCE_CAT_STUFFS, // must come before TABLE_TRANSMIT
 			TABLE_TRANSMIT, // must come before TABLE_MODULE_DATAELEMENT
-			TABLE_MODULE_DATAELEMENT, // must come before TABLE_MODULE
-			TABLE_MODULE
+			TABLE_MODULE,
+			TABLE_MODULE_DATAELEMENT // must come AFTER TABLE_MODULE
 		};
 
 		private static ushort[] primaryTableReadOrder = {
@@ -121,8 +121,8 @@ namespace DRBDBReader.DB
 
 		private static ushort[] finalTableReadOrder = {
 			TABLE_TRANSMIT, // must come before TABLE_MODULE_DATAELEMENT
-			TABLE_MODULE_DATAELEMENT, // must come before TABLE_MODULE
-			TABLE_MODULE
+			TABLE_MODULE,
+			TABLE_MODULE_DATAELEMENT // must come AFTER TABLE_MODULE
 		};
 
 		private static ushort[] noDependencyTables = {
