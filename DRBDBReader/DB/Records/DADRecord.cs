@@ -24,6 +24,8 @@ namespace DRBDBReader.DB.Records
 		private const byte FIELD_RESPONSE_LENGTH = 3;
 		private const byte FIELD_EXTRACT_OFFSET = 5;
 		private const byte FIELD_EXTRACT_SIZE = 6;
+		private const byte FIELD_EMPTY_ONE = 7;
+		private const byte FIELD_EMPTY_TWO = 8;
 		private const byte FIELD_PROTOCOL = 10;
 
 		public ushort id;
