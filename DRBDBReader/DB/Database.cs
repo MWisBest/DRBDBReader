@@ -89,9 +89,9 @@ namespace DRBDBReader.DB
 			TABLE_DRB_MENU,
 
 			TABLE_DES_INFO, // must come before TABLE_TRANSMIT, maybe others?
-			TABLE_SERIVCE_CAT_STUFFS, // must come before TABLE_TRANSMIT
-			TABLE_TRANSMIT, // must come before TABLE_MODULE_DATAELEMENT
+			TABLE_SERIVCE_CAT_STUFFS, // must come before TABLE_TRANSMIT and TABLE_MODULE
 			TABLE_MODULE,
+			TABLE_TRANSMIT, // must come before TABLE_MODULE_DATAELEMENT
 			TABLE_MODULE_DATAELEMENT // must come AFTER TABLE_MODULE
 		};
 
@@ -107,7 +107,8 @@ namespace DRBDBReader.DB
 			TABLE_DRB_MENU,
 
 			TABLE_DES_INFO, // must come before TABLE_TRANSMIT, maybe others?
-			TABLE_SERIVCE_CAT_STUFFS // must come before TABLE_TRANSMIT
+			TABLE_SERIVCE_CAT_STUFFS, // must come before TABLE_TRANSMIT and TABLE_MODULE
+			TABLE_MODULE
 		};
 
 		// Secondary tables have no string dependencies, to avoid locking in Database.getString()
@@ -121,7 +122,6 @@ namespace DRBDBReader.DB
 
 		private static ushort[] finalTableReadOrder = {
 			TABLE_TRANSMIT, // must come before TABLE_MODULE_DATAELEMENT
-			TABLE_MODULE,
 			TABLE_MODULE_DATAELEMENT // must come AFTER TABLE_MODULE
 		};
 
