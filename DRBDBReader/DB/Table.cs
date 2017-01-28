@@ -237,11 +237,11 @@ namespace DRBDBReader.DB
 			return null;
 		}
 
-		public int getColumnOffset( byte col )
+		public ushort getColumnOffset( byte col )
 		{
-			int colOffset = 0;
+			ushort colOffset = 0;
 
-			for( int i = 0; i < col; ++i )
+			for( byte i = 0; i < col; ++i )
 			{
 				colOffset += this.colSizes[i];
 			}
@@ -261,7 +261,7 @@ namespace DRBDBReader.DB
 			return ret;
 		}
 
-		public long readInternal( byte[] record, int colOffset, int colSize )
+		public long readInternal( byte[] record, ushort colOffset, byte colSize )
 		{
 			/* Previously, this method did something like this:
 			 * byte[] scratch = new byte[8];
@@ -310,7 +310,7 @@ namespace DRBDBReader.DB
 		{
 			List<Record> ret = new List<Record>();
 			long val;
-			for( int i = 0; i < this.records.Length; ++i )
+			for( ushort i = 0; i < this.records.Length; ++i )
 			{
 				val = this.readField( this.records[i], field );
 				if( val == key )
