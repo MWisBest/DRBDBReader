@@ -174,7 +174,7 @@ namespace DRBDBReader
 										}
 										this.writeBulkToConsole( temp + "; 0x" + u.ToString( "x" ) );
 									}
-									else if( templower.Contains( tofind ) && !templower.Contains( "ccd;" ) )
+									else if( templower.Contains( tofind ) )
 									{
 										this.writeBulkToConsole( temp + "; 0x" + u.ToString( "x" ) );
 									}
