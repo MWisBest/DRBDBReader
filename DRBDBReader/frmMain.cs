@@ -233,22 +233,48 @@ namespace DRBDBReader
 
 						string[] stringfuzzsplit = splitted[1].Split( new char[] { ' ' }, 2 );
 
-						ushort tableNumTwo = Util.parseUShort( stringfuzzsplit[0] );
-						byte tableCol = (byte)Util.parseUShort( stringfuzzsplit[1] );
-						Table tt = this.db.tables[tableNumTwo];
-						int hits = 0;
+						ushort stringfuzzTable = Util.parseUShort( stringfuzzsplit[0] );
+						byte stringfuzzTableCol = (byte)Util.parseUShort( stringfuzzsplit[1] );
+						Table tt = this.db.tables[stringfuzzTable];
+						int stringfuzzhits = 0;
 
-						foreach( Record fuzzrec in tt.records )
+						foreach( Record stringfuzzrec in tt.records )
 						{
-							ushort fuzzfield = (ushort)tt.readField( fuzzrec, tableCol );
-							string fuzzstring = this.db.getString( fuzzfield );
-							if( fuzzstring != "(null)" )
+							ushort stringfuzzfield = (ushort)tt.readField( stringfuzzrec, stringfuzzTableCol );
+							string stringfuzzstring = this.db.getString( stringfuzzfield );
+							if( stringfuzzstring != "(null)" )
 							{
-								++hits;
+								++stringfuzzhits;
 							}
 						}
 
-						this.writeToConsole( "Records: " + tt.records.Length + "; Hits: " + hits + Environment.NewLine );
+						this.writeToConsole( "Records: " + tt.records.Length + "; Hits: " + stringfuzzhits + Environment.NewLine );
+
+						break;
+					case "genericidfuzz":
+						this.checkDB();
+
+						string[] fuzzsplit = splitted[1].Split( new char[] { ' ' }, 4 );
+
+						ushort fuzzerTableId = Util.parseUShort( fuzzsplit[0] );
+						byte fuzzerTableCol = (byte)Util.parseUShort( fuzzsplit[1] );
+						ushort fuzzingTableId = Util.parseUShort( fuzzsplit[2] );
+						byte fuzzingTableCol = (byte)Util.parseUShort( fuzzsplit[3] );
+						Table fuzzerTable = this.db.tables[fuzzerTableId];
+						Table fuzzingTable = this.db.tables[fuzzingTableId];
+						int fuzzhits = 0;
+
+						foreach( Record fuzzingRec in fuzzingTable.records )
+						{
+							uint fuzzingRecID = (uint)fuzzingTable.readField( fuzzingRec, fuzzingTableCol );
+							Record fuzzerRec = fuzzerTable.getRecord( fuzzingRecID, idcol: fuzzerTableCol, sorted: false );
+							if( fuzzerRec != null )
+							{
+								++fuzzhits;
+							}
+						}
+
+						this.writeToConsole( "Records: " + fuzzingTable.records.Length + "; Hits: " + fuzzhits + Environment.NewLine );
 
 						break;
 					case "modid":
