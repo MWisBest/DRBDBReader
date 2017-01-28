@@ -24,6 +24,8 @@ namespace DRBDBReader.DB.Records
 		private const byte FIELD_ID = 0;
 		private const byte FIELD_SLOPE = 1;
 		private const byte FIELD_OFFSET = 2;
+		private const byte FIELD_THREE = 3; // Always 0 or 257
+		private const byte FIELD_FOUR = 4; // Always 0
 
 		public ushort id;
 

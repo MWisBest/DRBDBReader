@@ -32,7 +32,7 @@ namespace DRBDBReader.DB.Converters
 			this.dsid = dsid;
 		}
 
-		public virtual string processData( long data )
+		public virtual string processData( long data, bool outputMetric = false )
 		{
 			return "(null)";
 		}

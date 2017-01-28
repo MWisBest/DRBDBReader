@@ -127,6 +127,7 @@ namespace DRBDBReader
 
 						break;
 					case "txrunconverter":
+					case "txrunconvertermetric":
 						this.checkDB();
 
 						string[] txconvsplit = splitted[1].Split( new char[] { ' ' }, 2 );
@@ -138,7 +139,7 @@ namespace DRBDBReader
 						Table txconvtable = this.db.tables[Database.TABLE_TRANSMIT];
 						TXRecord txconvrec = (TXRecord)txconvtable.getRecord( txid );
 
-						string result = txconvrec.converter.processData( convdata );
+						string result = txconvrec.converter.processData( convdata, outputMetric: splitted[0].EndsWith( "metric" )  );
 
 						this.writeToConsole( result + Environment.NewLine );
 
@@ -237,6 +238,7 @@ namespace DRBDBReader
 						byte stringfuzzTableCol = (byte)Util.parseUShort( stringfuzzsplit[1] );
 						Table tt = this.db.tables[stringfuzzTable];
 						int stringfuzzhits = 0;
+						int stringfuzzzeros = 0;
 
 						foreach( Record stringfuzzrec in tt.records )
 						{
@@ -246,9 +248,13 @@ namespace DRBDBReader
 							{
 								++stringfuzzhits;
 							}
+							if( stringfuzzfield == 0 )
+							{
+								++stringfuzzzeros;
+							}
 						}
 
-						this.writeToConsole( "Records: " + tt.records.Length + "; Hits: " + stringfuzzhits + Environment.NewLine );
+						this.writeToConsole( "Records: " + tt.records.Length + "; Hits: " + stringfuzzhits  + "; Zeros: " + stringfuzzzeros + Environment.NewLine );
 
 						break;
 					case "genericidfuzz":
@@ -263,6 +269,7 @@ namespace DRBDBReader
 						Table fuzzerTable = this.db.tables[fuzzerTableId];
 						Table fuzzingTable = this.db.tables[fuzzingTableId];
 						int fuzzhits = 0;
+						int fuzzzeros = 0;
 
 						foreach( Record fuzzingRec in fuzzingTable.records )
 						{
@@ -272,9 +279,13 @@ namespace DRBDBReader
 							{
 								++fuzzhits;
 							}
+							if( fuzzingRecID == 0 )
+							{
+								++fuzzzeros;
+							}
 						}
 
-						this.writeToConsole( "Records: " + fuzzingTable.records.Length + "; Hits: " + fuzzhits + Environment.NewLine );
+						this.writeToConsole( "Records: " + fuzzingTable.records.Length + "; Hits: " + fuzzhits + "; Zeros: " + fuzzzeros + Environment.NewLine );
 
 						break;
 					case "modid":

@@ -51,7 +51,7 @@ namespace DRBDBReader.DB.Converters
 			}
 		}
 
-		public override string processData( long data )
+		public override string processData( long data, bool outputMetric = false )
 		{
 			ushort entryID = this.getEntryID( (ushort)data );
 			if( this.entries.ContainsKey( entryID ) )

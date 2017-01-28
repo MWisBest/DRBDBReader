@@ -44,7 +44,7 @@ namespace DRBDBReader.DB.Converters
 			}
 		}
 
-		public override string processData( long data )
+		public override string processData( long data, bool outputMetric = false )
 		{
 			return "type: " + this.record[0] + "; rec: " + BitConverter.ToString( this.record ) + "; dsrec: " + BitConverter.ToString( this.dsrec.record );
 		}

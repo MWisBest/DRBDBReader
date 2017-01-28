@@ -15,7 +15,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-using System;
 using DRBDBReader.DB.Records;
 
 namespace DRBDBReader.DB.Converters
@@ -34,10 +33,16 @@ namespace DRBDBReader.DB.Converters
 			this.ndsRecord = (NDSRecord)ndsTable.getRecord( this.dsid );
 		}
 
-		public override string processData( long data )
+		public override string processData( long data, bool outputMetric = false )
 		{
 			double result = data * this.ncRecord.slope + this.ncRecord.offset;
-			return result + " " + this.ndsRecord.unitString;
+			string unit = this.ndsRecord.imperialUnitString;
+			if( outputMetric )
+			{
+				result = result * this.ndsRecord.metricConvSlope + this.ndsRecord.metricConvOffset;
+				unit = this.ndsRecord.metricUnitString;
+			}
+			return result + " " + unit;
 		}
 	}
 }
