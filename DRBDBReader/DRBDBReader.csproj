@@ -58,6 +58,7 @@
     <Compile Include="DB\Records\SCRecord.cs" />
     <Compile Include="DB\Records\SDSRecord.cs" />
     <Compile Include="DB\Records\StateEntryRecord.cs" />
+    <Compile Include="DB\Records\StringRecord.cs" />
     <Compile Include="DB\SimpleBinaryReader.cs" />
     <Compile Include="DB\Records\DADRecord.cs" />
     <Compile Include="DB\Records\DESRecord.cs" />

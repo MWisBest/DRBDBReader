@@ -109,6 +109,12 @@ namespace DRBDBReader.DB
 						records[i] = new StateEntryRecord( this, this.db.dbReader.ReadBytes( ref readOffset, this.rowSize ) );
 					}
 					break;
+				case Database.TABLE_STRINGS:
+					for( ushort i = 0; i < this.rowCount; ++i )
+					{
+						records[i] = new StringRecord( this, this.db.dbReader.ReadBytes( ref readOffset, this.rowSize ) );
+					}
+					break;
 				case Database.TABLE_DATA_ACQUISITION_DESCRIPTION:
 					for( ushort i = 0; i < this.rowCount; ++i )
 					{

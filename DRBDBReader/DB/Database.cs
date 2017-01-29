@@ -19,7 +19,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using DRBDBReader.DB.Records;
 
@@ -43,7 +42,7 @@ namespace DRBDBReader.DB
 		public const ushort TABLE_STATE_DATA_SPECIFIER = 13;
 		public const ushort TABLE_UNKNOWN_14 = 14;
 		public const ushort TABLE_STATE_ENTRY = 15;
-		public const ushort TABLE_STATE = 16;
+		public const ushort TABLE_STRINGS = 16;
 		public const ushort TABLE_NUMERIC_DATA_SPECIFIER = 17;
 		public const ushort TABLE_DATAELEMENT_QUALIFIER = 18;
 		public const ushort TABLE_UNKNOWN_19 = 19;
@@ -61,9 +60,9 @@ namespace DRBDBReader.DB
 		public Table[] tables;
 
 		private static ushort[] syncedTableReadOrder = {
-			TABLE_DBTEXT_1,
-			TABLE_DBTEXT_2,
-			TABLE_STATE,
+			TABLE_DBTEXT_1, // must come before TABLE_STRINGS
+			TABLE_DBTEXT_2, // must come before TABLE_STRINGS
+			TABLE_STRINGS,
 
 			TABLE_EMPTY_12,
 			TABLE_EMPTY_24,
@@ -218,11 +217,13 @@ namespace DRBDBReader.DB
 
 			dbTextOneThread.Start( new ushort[] { TABLE_DBTEXT_1 } );
 			dbTextTwoThread.Start( new ushort[] { TABLE_DBTEXT_2 } );
-			stateTableThread.Start( new ushort[] { TABLE_STATE } );
-
-			stateTableThread.Join();
 			dbTextTwoThread.Join();
 			dbTextOneThread.Join();
+
+			// TABLE_STRINGS depends on the first two
+			stateTableThread.Start( new ushort[] { TABLE_STRINGS } );
+			stateTableThread.Join();
+
 
 			// Now read off the two thread-able Table sets
 			Thread primaryTableThread = new Thread( this.readTables );
@@ -250,53 +251,17 @@ namespace DRBDBReader.DB
 			}
 		}
 
-		private StringBuilder cachedStateBuilder = new StringBuilder();
-		private object stateBuilderLock = new object();
-		private Dictionary<ushort, string> cachedStrings = new Dictionary<ushort, string>();
-
 		public string getString( ushort id )
 		{
-			if( this.cachedStrings.ContainsKey( id ) )
-			{
-				return this.cachedStrings[id];
-			}
-
-			Table t = this.tables[TABLE_STATE];
+			Table t = this.tables[TABLE_STRINGS];
 			Record recordObj = t.getRecord( id );
-			
+
 			if( recordObj == null )
 			{
 				return "(null)";
 			}
 
-			int p = (int)t.readField( recordObj, 1 );
-			Table txtTable = this.tables[(ushort)(TABLE_DBTEXT_1 + ( p >> 24 ))];
-
-			int offset = ( p & 0xFFFFFF );
-			int row = (int)Math.Floor( (double)( offset / txtTable.rowSize ) );
-			int rowOffset = offset % txtTable.rowSize;
-			Record txtRecord = txtTable.records[row];
-			byte curByte;
-
-			lock( stateBuilderLock )
-			{
-				cachedStateBuilder.Clear();
-
-				while( ( curByte = txtRecord.record[rowOffset] ) != 0 )
-				{
-					cachedStateBuilder.Append( Convert.ToChar( curByte ) );
-					++rowOffset;
-					if( rowOffset >= txtTable.rowSize )
-					{
-						rowOffset = 0;
-						txtRecord = txtTable.records[++row];
-					}
-				}
-
-				this.cachedStrings[id] = cachedStateBuilder.ToString();
-			}
-
-			return this.cachedStrings[id];
+			return ( (StringRecord)recordObj ).text;
 		}
 
 		public string getServiceCatString( ushort id )
