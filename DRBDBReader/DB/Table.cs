@@ -16,6 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using DRBDBReader.DB.Converters;
 using DRBDBReader.DB.Records;
@@ -32,7 +33,7 @@ namespace DRBDBReader.DB
 		public byte[] colSizes;
 		public Record[] records;
 		public Database db;
-		private Dictionary<long, int> idToRecordCache;
+		private ConcurrentDictionary<long, int> idToRecordCache;
 
 		// Caches Converter classes for TX table. Odd placement, but... it works.
 		public Dictionary<ushort, Dictionary<ushort, BinaryStateConverter>> txBSCCache;
@@ -55,7 +56,7 @@ namespace DRBDBReader.DB
 			this.colCount = colCount;
 			this.colSizes = colSizes;
 			this.records = new Record[rowCount];
-			this.idToRecordCache = new Dictionary<long, int>();
+			this.idToRecordCache = new ConcurrentDictionary<long, int>( 4, this.rowCount / 2 );
 
 			if( this.id == Database.TABLE_TRANSMIT )
 			{
