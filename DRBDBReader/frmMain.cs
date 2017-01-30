@@ -121,7 +121,7 @@ namespace DRBDBReader
 							string toWrite = "text: " + stringRec.text;
 							if( stringRec.obdCodeString != "" && stringRec.obdCodeString != " " )
 							{
-								toWrite += "; obdCodeString: " + stringRec.obdCodeString;
+								toWrite += "; OBD: " + stringRec.obdCodeString;
 							}
 							this.writeToConsole( toWrite + Environment.NewLine );
 						}
@@ -145,7 +145,7 @@ namespace DRBDBReader
 								string toWrite = "0x" + sr.id.ToString( "x4" ) + ": text: " + sr.text;
 								if( sr.obdCodeString != "" && sr.obdCodeString != " " )
 								{
-									toWrite += "; obdCodeString: " + sr.obdCodeString;
+									toWrite += "; OBD: " + sr.obdCodeString;
 								}
 								this.writeBulkToConsole( toWrite );
 							}
