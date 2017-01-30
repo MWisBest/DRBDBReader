@@ -131,6 +131,29 @@ namespace DRBDBReader
 						}
 
 						break;
+					case "stringsearch":
+						this.checkDB();
+
+						this.writeBulkToConsoleStart();
+
+						string searching = splitted[1].ToLower();
+
+						foreach( StringRecord sr in this.db.tables[Database.TABLE_STRINGS].records )
+						{
+							if( sr.text.ToLower().Contains( searching ) )
+							{
+								string toWrite = "0x" + sr.id.ToString( "x4" ) + ": text: " + sr.text;
+								if( sr.obdCodeString != "" && sr.obdCodeString != " " )
+								{
+									toWrite += "; obdCodeString: " + sr.obdCodeString;
+								}
+								this.writeBulkToConsole( toWrite );
+							}
+						}
+
+						this.writeBulkToConsoleEnd();
+
+						break;
 					case "txid":
 						this.checkDB();
 
