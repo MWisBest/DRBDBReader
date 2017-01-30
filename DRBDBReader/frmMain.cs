@@ -248,7 +248,7 @@ namespace DRBDBReader
 						}
 						else
 						{
-							this.writeToConsole( "Not a StateConverter." );
+							this.writeToConsole( "Not a StateConverter." + Environment.NewLine );
 						}
 
 						break;
