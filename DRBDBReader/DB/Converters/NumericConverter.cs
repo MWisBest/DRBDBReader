@@ -30,7 +30,8 @@ namespace DRBDBReader.DB.Converters
 			this.ncRecord = (NCRecord)numConvTable.getRecord( this.cfid );
 
 			Table ndsTable = this.db.tables[Database.TABLE_NUMERIC_DATA_SPECIFIER];
-			this.ndsRecord = (NDSRecord)ndsTable.getRecord( this.dsid );
+			this.dsRecord = ndsTable.getRecord( this.dsid );
+			this.ndsRecord = (NDSRecord)this.dsRecord;
 		}
 
 		public override string processData( long data, bool outputMetric = false )

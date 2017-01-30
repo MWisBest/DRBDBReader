@@ -215,6 +215,17 @@ namespace DRBDBReader
 						}
 
 						break;
+					case "convertertostring":
+						this.checkDB();
+
+						txid = Util.parseUInt( splitted[1] );
+
+						Table ctsTable = this.db.tables[Database.TABLE_TRANSMIT];
+						TXRecord ctsTxRecord = (TXRecord)ctsTable.getRecord( txid );
+
+						this.writeToConsole( ctsTxRecord.converter.ToString() );
+
+						break;
 					case "dumptableinfo":
 						this.checkDB();
 

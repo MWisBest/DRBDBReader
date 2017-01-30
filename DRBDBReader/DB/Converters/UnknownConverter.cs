@@ -22,31 +22,29 @@ namespace DRBDBReader.DB.Converters
 {
 	public class UnknownConverter : Converter
 	{
-		public Record dsrec;
-
 		public UnknownConverter( Database db, byte[] record, ushort cfid, ushort dsid ) : base( db, record, cfid, dsid )
 		{
 			Table dstable;
 			if( this.record[0] == 2 )
 			{
 				dstable = this.db.tables[Database.TABLE_BINARY_DATA_SPECIFIER];
-				dsrec = dstable.getRecord( this.dsid );
+				this.dsRecord = dstable.getRecord( this.dsid );
 			}
 			else if( this.record[0] == 18 )
 			{
 				dstable = this.db.tables[Database.TABLE_NUMERIC_DATA_SPECIFIER];
-				dsrec = dstable.getRecord( this.dsid );
+				this.dsRecord = dstable.getRecord( this.dsid );
 			}
 			else if( this.record[0] == 34 )
 			{
 				dstable = this.db.tables[Database.TABLE_STATE_DATA_SPECIFIER];
-				dsrec = dstable.getRecord( this.dsid );
+				this.dsRecord = dstable.getRecord( this.dsid );
 			}
 		}
 
 		public override string processData( long data, bool outputMetric = false )
 		{
-			return "type: " + this.record[0] + "; rec: " + BitConverter.ToString( this.record ) + "; dsrec: " + BitConverter.ToString( this.dsrec.record );
+			return this.ToString();
 		}
 	}
 }

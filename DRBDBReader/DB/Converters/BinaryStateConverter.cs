@@ -21,6 +21,8 @@ namespace DRBDBReader.DB.Converters
 {
 	public class BinaryStateConverter : StateConverter
 	{
+		public BDSRecord bdsRecord;
+
 		public BinaryStateConverter( Database db, byte[] record, ushort cfid, ushort dsid ) : base( db, record, cfid, dsid )
 		{
 		}
@@ -28,7 +30,8 @@ namespace DRBDBReader.DB.Converters
 		protected override void buildStateList()
 		{
 			Table bdsTable = this.db.tables[Database.TABLE_BINARY_DATA_SPECIFIER];
-			BDSRecord bdsRecord = (BDSRecord)bdsTable.getRecord( this.dsid );
+			this.dsRecord = bdsTable.getRecord( this.dsid );
+			this.bdsRecord = (BDSRecord)this.dsRecord;
 
 			this.entries.Add( 0, bdsRecord.falseString );
 			this.entries.Add( 1, bdsRecord.trueString );

@@ -39,7 +39,8 @@ namespace DRBDBReader.DB.Converters
 		protected virtual void buildStateList()
 		{
 			Table sdsTable = this.db.tables[Database.TABLE_STATE_DATA_SPECIFIER];
-			this.sdsRecord = (SDSRecord)sdsTable.getRecord( this.dsid );
+			this.dsRecord = sdsTable.getRecord( this.dsid );
+			this.sdsRecord = (SDSRecord)this.dsRecord;
 
 			Table stateTable = this.db.tables[Database.TABLE_STATE_ENTRY];
 			foreach( StateEntryRecord seRecord in stateTable.records )

@@ -15,6 +15,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+using System;
+using DRBDBReader.DB.Records;
+
 namespace DRBDBReader.DB.Converters
 {
 	public class Converter
@@ -23,6 +26,7 @@ namespace DRBDBReader.DB.Converters
 		public byte[] record;
 		public ushort cfid;
 		public ushort dsid;
+		public Record dsRecord;
 
 		public Converter( Database db, byte[] record, ushort cfid, ushort dsid )
 		{
@@ -35,6 +39,16 @@ namespace DRBDBReader.DB.Converters
 		public virtual string processData( long data, bool outputMetric = false )
 		{
 			return "(null)";
+		}
+
+		public override string ToString()
+		{
+			string ret = "type: " + this.record[0] + "; rec: " + BitConverter.ToString( this.record );
+			if( this.dsRecord != null )
+			{
+				ret += "; dsrec: " + BitConverter.ToString( this.dsRecord.record );
+			}
+			return ret;
 		}
 	}
 }
