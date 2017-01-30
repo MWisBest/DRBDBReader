@@ -159,7 +159,7 @@ namespace DRBDBReader
 
 						txid = Util.parseUInt( splitted[1] );
 
-						this.writeToConsole( this.db.getDetailedTX( (uint)txid ) + Environment.NewLine );
+						this.writeToConsole( this.db.getDetailedTX( txid ) + Environment.NewLine );
 
 						break;
 					case "txrunconverter":
