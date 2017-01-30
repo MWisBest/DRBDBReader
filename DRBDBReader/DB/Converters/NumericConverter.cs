@@ -35,11 +35,11 @@ namespace DRBDBReader.DB.Converters
 
 		public override string processData( long data, bool outputMetric = false )
 		{
-			double result = data * this.ncRecord.slope + this.ncRecord.offset;
+			decimal result = data * (decimal)this.ncRecord.slope + (decimal)this.ncRecord.offset;
 			string unit = this.ndsRecord.imperialUnitString;
 			if( outputMetric )
 			{
-				result = result * this.ndsRecord.metricConvSlope + this.ndsRecord.metricConvOffset;
+				result = result * (decimal)this.ndsRecord.metricConvSlope + (decimal)this.ndsRecord.metricConvOffset;
 				unit = this.ndsRecord.metricUnitString;
 			}
 			return result + " " + unit;
