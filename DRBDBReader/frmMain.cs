@@ -140,7 +140,7 @@ namespace DRBDBReader
 
 						foreach( StringRecord sr in this.db.tables[Database.TABLE_STRINGS].records )
 						{
-							if( sr.text.ToLower().Contains( searching ) )
+							if( sr.text.ToLower().Contains( searching ) || sr.obdCodeString.ToLower().Contains( searching ) )
 							{
 								string toWrite = "0x" + sr.id.ToString( "x4" ) + ": text: " + sr.text;
 								if( sr.obdCodeString != "" && sr.obdCodeString != " " )
