@@ -239,10 +239,10 @@ namespace DRBDBReader
 						{
 							StateConverter dtcdumpconv = (StateConverter)dtcdumptxconvrec.converter;
 							this.writeBulkToConsoleStart();
-							this.writeBulkToConsole( "Default: " + dtcdumpconv.sdsRecord.defaultString );
+							this.writeBulkToConsole( "DFLT: " + dtcdumpconv.sdsRecord.defaultString );
 							foreach( KeyValuePair<ushort, string> kvp in dtcdumpconv.entries )
 							{
-								this.writeBulkToConsole( kvp.Key.ToString() + ": " + kvp.Value );
+								this.writeBulkToConsole( "0x" + kvp.Key.ToString( "X2" ) + ": " + kvp.Value );
 							}
 							this.writeBulkToConsoleEnd();
 						}
