@@ -115,7 +115,20 @@ namespace DRBDBReader
 
 						stid = Util.parseUShort( splitted[1] );
 
-						this.writeToConsole( this.db.getString( stid ) + Environment.NewLine );
+						StringRecord stringRec = (StringRecord)this.db.tables[Database.TABLE_STRINGS].getRecord( stid );
+						if( stringRec != null )
+						{
+							string toWrite = "text: " + stringRec.text;
+							if( stringRec.obdCodeString != "" && stringRec.obdCodeString != " " )
+							{
+								toWrite += "; obdCodeString: " + stringRec.obdCodeString;
+							}
+							this.writeToConsole( toWrite + Environment.NewLine );
+						}
+						else
+						{
+							this.writeToConsole( "(null)" + Environment.NewLine );
+						}
 
 						break;
 					case "txid":
