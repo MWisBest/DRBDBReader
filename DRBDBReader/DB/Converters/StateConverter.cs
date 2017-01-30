@@ -25,14 +25,14 @@ namespace DRBDBReader.DB.Converters
 		public SCRecord scRecord;
 
 		public SDSRecord sdsRecord;
-		public Dictionary<ushort, string> entries;
+		public SortedDictionary<ushort, string> entries;
 
 		public StateConverter( Database db, byte[] record, ushort cfid, ushort dsid ) : base( db, record, cfid, dsid )
 		{
 			Table stateConvTable = this.db.tables[Database.TABLE_CONVERTERS_STATE];
 			this.scRecord = (SCRecord)stateConvTable.getRecord( this.cfid );
 
-			this.entries = new Dictionary<ushort, string>();
+			this.entries = new SortedDictionary<ushort, string>();
 			this.buildStateList();
 		}
 
