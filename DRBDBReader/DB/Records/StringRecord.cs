@@ -47,14 +47,23 @@ namespace DRBDBReader.DB.Records
 
 			this.text = this.readText();
 
-			this.obdCodeBytes = this.table.readFieldRaw( this, FIELD_OBD_CODE_STR );
-
-			int firstNullChar = Array.IndexOf( this.obdCodeBytes, (byte)0 );
-			if( firstNullChar == -1 )
+			/* The StarSCAN database completely messes up the OBD code field. */
+			if( !this.table.db.isStarScanDB )
 			{
-				firstNullChar = this.obdCodeBytes.Length;
+				this.obdCodeBytes = this.table.readFieldRaw( this, FIELD_OBD_CODE_STR );
+
+				int firstNullChar = Array.IndexOf( this.obdCodeBytes, (byte)0 );
+				if( firstNullChar == -1 )
+				{
+					firstNullChar = this.obdCodeBytes.Length;
+				}
+				this.obdCodeString = Encoding.ASCII.GetString( this.obdCodeBytes, 0, firstNullChar );
 			}
-			this.obdCodeString = Encoding.ASCII.GetString( this.obdCodeBytes, 0, firstNullChar );
+			else
+			{
+				this.obdCodeBytes = null;
+				this.obdCodeString = "";
+			}
 		}
 
 		private string readText()
