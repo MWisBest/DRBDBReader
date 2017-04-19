@@ -304,6 +304,8 @@ namespace DRBDBReader.DB
 					return "CCD";
 				case 60:
 					return "SCI";
+				case 103:
+					return "ISO";
 				case 159:
 					return "Multimeter";
 				case 160:
