@@ -20,7 +20,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Windows.Forms;
 using DRBDBReader.DB;
-using DRBDBReader.DB.Converters;
 using DRBDBReader.DB.Records;
 
 namespace DRBDBReader
@@ -228,33 +227,7 @@ namespace DRBDBReader
 
 						break;
 					case "dumpstateconverter":
-						this.checkDB();
-
-						txid = Util.parseUInt( splitted[1] );
-
-						Table dtcdumptxconvtable = this.db.tables[Database.TABLE_TRANSMIT];
-						TXRecord dtcdumptxconvrec = (TXRecord)dtcdumptxconvtable.getRecord( txid );
-
-						if( dtcdumptxconvrec.converter is StateConverter )
-						{
-							StateConverter dtcdumpconv = (StateConverter)dtcdumptxconvrec.converter;
-							this.writeBulkToConsoleStart();
-							if( !( dtcdumpconv is BinaryStateConverter ) )
-							{
-								this.writeBulkToConsole( "DFLT: " + dtcdumpconv.sdsRecord.defaultString );
-							}
-							foreach( KeyValuePair<ushort, string> kvp in dtcdumpconv.entries )
-							{
-								this.writeBulkToConsole( "0x" + kvp.Key.ToString( "X2" ) + ": " + kvp.Value );
-							}
-							this.writeBulkToConsoleEnd();
-						}
-						else
-						{
-							this.writeToConsole( "Not a StateConverter." + Environment.NewLine );
-						}
-
-						break;
+					case "dumpconverter":
 					case "convertertostring":
 						this.checkDB();
 
@@ -263,7 +236,7 @@ namespace DRBDBReader
 						Table ctsTable = this.db.tables[Database.TABLE_TRANSMIT];
 						TXRecord ctsTxRecord = (TXRecord)ctsTable.getRecord( txid );
 
-						this.writeToConsole( ctsTxRecord.converter.ToString() );
+						this.writeToConsole( ctsTxRecord.converter.ToString() + Environment.NewLine );
 
 						break;
 					case "dumptableinfo":

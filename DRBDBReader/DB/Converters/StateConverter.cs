@@ -15,6 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+using System;
 using System.Collections.Generic;
 using DRBDBReader.DB.Records;
 
@@ -69,6 +70,23 @@ namespace DRBDBReader.DB.Converters
 				val = (ushort)( val & this.scRecord.mask );
 			}
 			return val;
+		}
+
+		public override string ToString()
+		{
+			string ret = base.ToString() + Environment.NewLine;
+
+			if( this.sdsRecord != null )
+			{
+				ret += Environment.NewLine + "DFLT: " + this.sdsRecord.defaultString;
+			}
+
+			foreach( KeyValuePair<ushort, string> kvp in this.entries )
+			{
+				ret += Environment.NewLine + "0x" + kvp.Key.ToString( "X2" ) + ": " + kvp.Value;
+			}
+
+			return ret;
 		}
 	}
 }

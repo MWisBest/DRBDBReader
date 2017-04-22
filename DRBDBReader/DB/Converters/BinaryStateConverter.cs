@@ -15,6 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+using System;
 using DRBDBReader.DB.Records;
 
 namespace DRBDBReader.DB.Converters
@@ -55,6 +56,18 @@ namespace DRBDBReader.DB.Converters
 				default:
 					return (ushort)( val == this.scRecord.mask ? 1 : 0 );
 			}
+		}
+
+		public override string ToString()
+		{
+			string ret = base.ToString() + Environment.NewLine;
+			ret = ret.Replace( Environment.NewLine + "0x00: ", Environment.NewLine + "FALSE: " );
+			ret = ret.Replace( Environment.NewLine + "0x01: ", Environment.NewLine + "TRUE:  " );
+
+			ret += Environment.NewLine + "MASK:  0x" + this.scRecord.mask.ToString( "X2" );
+			ret += Environment.NewLine + "OP:    " + this.scRecord.op.ToString();
+
+			return ret;
 		}
 	}
 }
