@@ -27,6 +27,7 @@ namespace DRBDBReader.DB.Converters
 		public ushort cfid;
 		public ushort dsid;
 		public Record dsRecord;
+		public Types type;
 
 		public Converter( Database db, byte[] record, ushort cfid, ushort dsid )
 		{
@@ -34,6 +35,7 @@ namespace DRBDBReader.DB.Converters
 			this.record = record;
 			this.cfid = cfid;
 			this.dsid = dsid;
+			this.type = (Types)this.record[0];
 		}
 
 		public virtual string processData( long data, bool outputMetric = false )
@@ -43,12 +45,22 @@ namespace DRBDBReader.DB.Converters
 
 		public override string ToString()
 		{
-			string ret = "type: " + this.record[0] + "; rec: " + BitConverter.ToString( this.record );
+			string ret = "type: " + this.type + "; rec: " + BitConverter.ToString( this.record );
 			if( this.dsRecord != null )
 			{
 				ret += "; dsrec: " + BitConverter.ToString( this.dsRecord.record );
 			}
 			return ret;
+		}
+
+		public enum Types : byte
+		{
+			BINARY_STATE = 0x00,
+			NUMERIC = 0x11,
+			STATE = 0x20,
+			UNKNOWN_x2 = 0x02,
+			UNKNOWN_x12 = 0x12,
+			UNKNOWN_x22 = 0x22
 		}
 	}
 }

@@ -61,20 +61,20 @@ namespace DRBDBReader.DB.Records
 			ushort dsid = (ushort)this.table.readInternal( convertfield, 2, 2 );
 			ushort cfid = (ushort)this.table.readInternal( convertfield, 4, 2 );
 
-			switch( convertfield[0] )
+			switch( (Converter.Types)convertfield[0] )
 			{
-				case 0:
+				case Converter.Types.BINARY_STATE:
 					this.converter = this.getBSC( convertfield, cfid, dsid );
 					break;
-				case 17:
+				case Converter.Types.NUMERIC:
 					this.converter = this.getNC( convertfield, cfid, dsid );
 					break;
-				case 32:
+				case Converter.Types.STATE:
 					this.converter = this.getSC( convertfield, cfid, dsid );
 					break;
-				case 2:
-				case 18:
-				case 34:
+				case Converter.Types.UNKNOWN_x2:
+				case Converter.Types.UNKNOWN_x12:
+				case Converter.Types.UNKNOWN_x22:
 					this.converter = this.getUC( convertfield, cfid, dsid );
 					break;
 				default:
