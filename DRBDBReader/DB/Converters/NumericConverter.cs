@@ -15,6 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+using System;
 using DRBDBReader.DB.Records;
 
 namespace DRBDBReader.DB.Converters
@@ -44,6 +45,38 @@ namespace DRBDBReader.DB.Converters
 				unit = this.ndsRecord.metricUnitString;
 			}
 			return result + " " + unit;
+		}
+
+		public override string ToString()
+		{
+			string ret = base.ToString() + Environment.NewLine;
+
+			if( this.ndsRecord.imperialUnitStrId == this.ndsRecord.metricUnitStrId )
+			{
+				ret += Environment.NewLine + "UNIT: " + getUnitToStringOutput( this.ndsRecord.imperialUnitString );
+			}
+			else
+			{
+				ret += Environment.NewLine + "UNIT (DFLT/MTRC): ";
+				ret += getUnitToStringOutput( this.ndsRecord.imperialUnitString );
+				ret += "/" + getUnitToStringOutput( this.ndsRecord.metricUnitString );
+			}
+
+			ret += Environment.NewLine + "SLOPE:  " + this.ncRecord.slope;
+			ret += Environment.NewLine + "OFFSET: " + this.ncRecord.offset;
+			ret += Environment.NewLine + "SLCONV: " + this.ndsRecord.metricConvSlope;
+			ret += Environment.NewLine + "OFCONV: " + this.ndsRecord.metricConvOffset;
+
+			return ret;
+		}
+
+		private static string getUnitToStringOutput( string unit )
+		{
+			if( string.IsNullOrWhiteSpace( unit ) )
+			{
+				return "(null)";
+			}
+			return unit;
 		}
 	}
 }
