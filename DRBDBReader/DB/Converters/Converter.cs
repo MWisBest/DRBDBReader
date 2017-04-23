@@ -45,10 +45,11 @@ namespace DRBDBReader.DB.Converters
 
 		public override string ToString()
 		{
-			string ret = "type: " + this.type + "; rec: " + BitConverter.ToString( this.record );
+			string ret = "TYPE:  " + this.type;
+			ret += Environment.NewLine + "REC:   " + BitConverter.ToString( this.record );
 			if( this.dsRecord != null )
 			{
-				ret += "; dsrec: " + BitConverter.ToString( this.dsRecord.record );
+				ret += Environment.NewLine + "DSREC: " + BitConverter.ToString( this.dsRecord.record );
 			}
 			return ret;
 		}
