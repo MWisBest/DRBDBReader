@@ -17,6 +17,7 @@
  */
 using System;
 using System.Text;
+using System.Threading;
 
 namespace DRBDBReader.DB.Records
 {
@@ -66,6 +67,9 @@ namespace DRBDBReader.DB.Records
 			}
 		}
 
+		// Avoid creating a new StringBuilder instance for every single record read
+		public static ThreadLocal<StringBuilder> cachedSB = new ThreadLocal<StringBuilder>( () => { return new StringBuilder(); } );
+
 		private string readText()
 		{
 			Table txtTable = this.table.db.tables[Database.TABLE_DBTEXT_1 + this.textTableNumber];
@@ -75,7 +79,14 @@ namespace DRBDBReader.DB.Records
 			Record txtRecord = txtTable.records[row];
 			byte curByte;
 
-			StringBuilder sb = new StringBuilder();
+			StringBuilder sb = cachedSB.Value;
+			sb.Clear();
+
+			// If the StringBuilder has ballooned in size reel it back in to a more reasonable value.
+			if( sb.Capacity >= 256 )
+			{
+				sb.Capacity = 64;
+			}
 
 			while( ( curByte = txtRecord.record[rowOffset++] ) != 0 )
 			{
